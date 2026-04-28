@@ -6,10 +6,9 @@
   <title>MasterDex</title>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800;900&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    /* 1. VARIÁVEIS DE TEMA DINÂMICO */
     :root {
-      --type-color: #f5f5f5;
-      --type-dark: #e0e0e0;
+      --type-color: #4A90E2;
+      --type-dark: #1a1a2e;
       --glass-bg: rgba(255, 255, 255, 0.5);
       --glass-border: rgba(255, 255, 255, 0.7);
       --text-main: #1a1a1a;
@@ -19,7 +18,7 @@
 
     [data-theme="dark"] {
         --glass-bg: rgba(30, 30, 45, 0.65);
-        --glass-border: rgba(255, 255, 255, 0.15);
+        --glass-border: rgba(255, 255, 255, 0.1);
         --text-main: #ffffff;
         --header-bg: rgba(0, 0, 0, 0.3);
         --card-inner: rgba(255, 255, 255, 0.08);
@@ -28,7 +27,7 @@
     @media (prefers-color-scheme: dark) {
       :root:not([data-theme="light"]) {
         --glass-bg: rgba(30, 30, 45, 0.65);
-        --glass-border: rgba(255, 255, 255, 0.15);
+        --glass-border: rgba(255, 255, 255, 0.1);
         --text-main: #ffffff;
         --header-bg: rgba(0, 0, 0, 0.3);
         --card-inner: rgba(255, 255, 255, 0.08);
@@ -36,7 +35,7 @@
     }
 
     @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
-    @keyframes fadeInGrid { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+    @keyframes fadeInGrid { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     
     body { 
       margin: 0; padding: 0; 
@@ -51,6 +50,7 @@
       background: var(--glass-bg); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
       border: 1px solid var(--glass-border); color: var(--text-main); 
       font-size: 20px; cursor: pointer; z-index: 2000; box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+      display: flex; justify-content: center; align-items: center;
     }
 
     header { 
@@ -75,14 +75,16 @@
     .grid-card { 
       background: var(--glass-bg); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
       border: 1px solid var(--glass-border); border-radius: 25px; padding: 25px 15px; 
-      text-align: center; cursor: pointer; transition: 0.2s; box-shadow: 0 8px 32px rgba(0,0,0,0.1);
-      animation: fadeInGrid 0.4s ease backwards;
+      text-align: center; cursor: pointer; transition: 0.3s ease; box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+      animation: fadeInGrid 0.4s ease backwards; display: flex; flex-direction: column; align-items: center;
     }
     .grid-card:hover { transform: translateY(-8px); background: rgba(255,255,255,0.2); }
     .grid-card img { width: 100px; height: 100px; object-fit: contain; filter: drop-shadow(0 5px 10px rgba(0,0,0,0.2)); }
-    .grid-name { font-family: 'Montserrat', sans-serif; font-size: 14px; font-weight: 800; text-transform: capitalize; margin-top: 10px; }
+    
+    .grid-id { font-size: 11px; font-weight: 800; opacity: 0.5; margin-top: 12px; }
+    .grid-name { font-family: 'Montserrat', sans-serif; font-size: 14px; font-weight: 800; text-transform: capitalize; margin: 5px 0; }
+    .grid-rarity { font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; }
 
-    /* 3. MODAL REVISADO */
     #modal-overlay { 
       position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
       background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
@@ -105,19 +107,14 @@
     .modal-layout { display: flex; flex-direction: column; align-items: center; gap: 25px; width: 100%; }
     #poke-image { width: 240px; height: 240px; object-fit: contain; animation: float 4s ease-in-out infinite; }
     #poke-name { font-family: 'Montserrat', sans-serif; font-size: 38px; font-weight: 900; text-transform: capitalize; text-align: center; margin: 0; }
-    #poke-id-modal { background: rgba(0,0,0,0.05); padding: 5px 15px; border-radius: 12px; font-weight: 800; opacity: 0.5; margin-top: 10px; }
+    #poke-id-modal { font-weight: 800; opacity: 0.5; margin-top: 10px; }
     #poke-desc { font-style: italic; background: var(--card-inner); padding: 25px; border-radius: 20px; border-left: 6px solid var(--type-color); line-height: 1.6; width: 100%; box-sizing: border-box; text-align: left; }
 
-    /* INFO GRID - CORRIGIDO ESPAÇAMENTO */
-    .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 100%; margin: 10px 0; }
-    .info-item { 
-        display: flex; flex-direction: row; justify-content: space-between; align-items: center; 
-        background: var(--card-inner); padding: 15px 20px; border-radius: 20px; border: 1px solid var(--glass-border); 
-    }
-    .info-label { font-size: 11px; font-weight: 800; opacity: 0.5; text-transform: uppercase; margin-right: 10px; }
-    .info-value { font-size: 16px; font-weight: 700; text-transform: capitalize; }
+    .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 100%; margin: 10px 0; }
+    .info-item { display: flex; flex-direction: row; justify-content: space-between; align-items: center; background: var(--card-inner); padding: 15px 20px; border-radius: 20px; border: 1px solid var(--glass-border); flex-wrap: wrap; gap: 5px; }
+    .info-label { font-size: 11px; font-weight: 800; opacity: 0.5; text-transform: uppercase; }
+    .info-value { font-size: 15px; font-weight: 700; }
 
-    /* STATS BOX */
     #poke-stats-box { width: 100%; background: var(--card-inner); padding: 30px; border-radius: 30px; box-sizing: border-box; }
     .stat-row { display: flex; align-items: center; margin-bottom: 12px; }
     .stat-name { width: 90px; font-size: 10px; font-weight: 900; opacity: 0.5; text-transform: uppercase; }
@@ -125,9 +122,8 @@
     .stat-bar-fill { height: 100%; background-color: var(--type-color); width: 0; transition: width 1s ease; }
     .stat-value { width: 35px; font-weight: 800; text-align: right; }
 
-    /* EVOLUTIONS */
     .evo-container { display: flex; justify-content: center; flex-wrap: wrap; gap: 20px; width: 100%; margin-top: 20px; }
-    .evo-card { background: var(--card-inner); border: 1px solid var(--glass-border); padding: 15px; border-radius: 22px; text-align: center; width: 105px; cursor: pointer; transition: 0.2s; }
+    .evo-card { background: var(--card-inner); border: 1px solid var(--glass-border); padding: 15px; border-radius: 22px; text-align: center; width: 105px; cursor: pointer; transition: 0.3s ease; }
     .evo-card:hover { transform: scale(1.08); border-color: var(--type-color); }
     .evo-card img { width: 75px; height: 75px; }
     .evo-name { font-size: 10px; font-weight: 900; text-transform: capitalize; margin-top: 10px; }
@@ -139,6 +135,7 @@
       .modal-layout { flex-direction: row; align-items: flex-start; gap: 45px; }
       #poke-image { width: 300px; height: 300px; align-self: center; }
       .info-grid { grid-template-columns: 1fr 1fr 1fr; }
+      .info-item { flex-direction: column; gap: 5px; }
       #pokedex-grid { padding-top: 200px; }
     }
   </style>
@@ -171,7 +168,7 @@
           <div class="info-grid">
             <div class="info-item"><span class="info-label">Altura</span><span class="info-value" id="poke-height"></span></div>
             <div class="info-item"><span class="info-label">Peso</span><span class="info-value" id="poke-weight"></span></div>
-            <div class="info-item"><span class="info-label">Raridade</span><span class="info-value" id="poke-rarity"></span></div>
+            <div class="info-item"><span class="info-label">Raridade</span><span class="info-value" id="poke-rarity-modal"></span></div>
             <div class="info-item"><span class="info-label">Geração</span><span class="info-value" id="poke-gen"></span></div>
             <div class="info-item" style="grid-column: span 2;"><span class="info-label">Habilidades</span><span class="info-value" id="poke-abilities"></span></div>
           </div>
@@ -188,8 +185,6 @@
   </div>
 
   <script>
-    /* 4. DICIONÁRIOS DE TRADUÇÃO */
-    const typeMap = { normal: 'Normal', fire: 'Fogo', water: 'Água', electric: 'Elétrico', grass: 'Grama', ice: 'Gelo', fighting: 'Lutador', poison: 'Venenoso', ground: 'Terrestre', flying: 'Voador', psychic: 'Psíquico', bug: 'Inseto', rock: 'Pedra', ghost: 'Fantasma', dragon: 'Dragão', dark: 'Sombrio', steel: 'Aço', fairy: 'Fada' };
     const typeColors = { normal: '#9FA19F', fire: '#F45C19', water: '#3A8DE9', electric: '#F2D335', grass: '#53BA4E', ice: '#6CD4D0', fighting: '#CE426B', poison: '#AA6BC8', ground: '#D97944', flying: '#91A8E1', psychic: '#FB8886', bug: '#90C12B', rock: '#C6B78B', ghost: '#5269AD', dragon: '#0B6DC4', dark: '#5A5465', steel: '#5A8FA3', fairy: '#EC8FE6' };
     const statMap = { hp: 'HP', attack: 'ATAQUE', defense: 'DEFESA', 'special-attack': 'ATQ. ESP', 'special-defense': 'DEF. ESP', speed: 'VELOCIDADE' };
     const genMap = { 'generation-i': '1ª Gen', 'generation-ii': '2ª Gen', 'generation-iii': '3ª Gen', 'generation-iv': '4ª Gen', 'generation-v': '5ª Gen', 'generation-vi': '6ª Gen', 'generation-vii': '7ª Gen', 'generation-viii': '8ª Gen', 'generation-ix': '9ª Gen' };
@@ -197,32 +192,41 @@
     let allPokemon = [];
     let lastScrollTop = 0;
 
-    /* LOGICA TEMA */
     function toggleTheme() {
       const html = document.documentElement;
-      const current = html.getAttribute("data-theme") || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
-      const target = current === "dark" ? "light" : "dark";
+      const target = html.getAttribute("data-theme") === "dark" ? "light" : "dark";
       html.setAttribute("data-theme", target);
       localStorage.setItem("pokedex-theme", target);
     }
     if(localStorage.getItem("pokedex-theme")) document.documentElement.setAttribute("data-theme", localStorage.getItem("pokedex-theme"));
 
-    /* HEADER */
     window.addEventListener("scroll", () => {
       const top = window.pageYOffset || document.documentElement.scrollTop;
       document.getElementById("main-header").classList.toggle("hide", top > lastScrollTop && top > 150);
       lastScrollTop = top <= 0 ? 0 : top;
     });
 
-    /* INICIO */
     async function init() {
       const res = await fetch('https://pokeapi.co/api/v2/pokemon?limit=1025');
       const data = await res.json();
       allPokemon = data.results;
       renderGrid(allPokemon);
       document.getElementById('main-loader').style.display='none';
+      
       const randId = Math.floor(Math.random() * 151) + 1;
-      fetch(`https://pokeapi.co/api/v2/pokemon/${randId}`).then(r => r.json()).then(d => applyColors(d.types[0].type.name));
+      fetch(`https://pokeapi.co/api/v2/pokemon/${randId}`).then(r => r.json()).then(d => {
+        document.documentElement.style.setProperty('--type-color', typeColors[d.types[0].type.name]);
+      });
+    }
+
+    function getRarityInfo(id) {
+        // IDs conhecidos de Lendários e Míticos
+        const legendaries = [144,145,146,150,243,244,245,249,250,377,378,379,380,381,382,383,384,480,481,482,483,484,485,486,487,488,638,639,640,641,642,643,644,645,646,716,717,718,772,773,785,786,787,788,789,790,791,792,800,888,889,890,891,892,894,895,896,897,898];
+        const mythicals = [151,251,385,386,489,490,491,492,493,494,647,648,649,719,720,721,801,802,807,808,809,893];
+        const nId = parseInt(id);
+        if (legendaries.includes(nId)) return { label: 'Lendário', color: '#FFD700' };
+        if (mythicals.includes(nId)) return { label: 'Mítico', color: '#D470FF' };
+        return { label: 'Comum', color: '' };
     }
 
     function renderGrid(list) {
@@ -230,19 +234,18 @@
       const frag = document.createDocumentFragment();
       list.forEach(p => {
         const id = p.url.split('/').filter(Boolean).pop();
+        const rarity = getRarityInfo(id);
         const card = document.createElement('div'); card.className = 'grid-card';
         card.onclick = () => openModal(id);
-        card.innerHTML = `<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${id}.png" loading="lazy"><div class="grid-name">${p.name.replace(/-/g, ' ')}</div>`;
+        card.innerHTML = `
+            <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${id}.png" loading="lazy">
+            <div class="grid-id">#${id.padStart(3,'0')}</div>
+            <div class="grid-name">${p.name.replace(/-/g, ' ')}</div>
+            <div class="grid-rarity" style="color:${rarity.color}">${rarity.label}</div>
+        `;
         frag.appendChild(card);
       });
       grid.appendChild(frag);
-    }
-
-    function applyColors(t) {
-      const c = typeColors[t] || '#777';
-      document.documentElement.style.setProperty('--type-color', c);
-      let r=parseInt(c.substring(1,3),16), g=parseInt(c.substring(3,5),16), b=parseInt(c.substring(5,7),16);
-      document.documentElement.style.setProperty('--type-dark', `rgb(${Math.round(r*0.4)},${Math.round(g*0.4)},${Math.round(b*0.4)})`);
     }
 
     document.getElementById('search-input').oninput = (e) => {
@@ -250,7 +253,6 @@
       renderGrid(allPokemon.filter(p => p.name.includes(t) || p.url.includes('/' + t + '/')));
     };
 
-    /* MOTOR DO MODAL */
     async function openModal(id) {
       const overlay = document.getElementById('modal-overlay');
       overlay.classList.add('active');
@@ -259,7 +261,8 @@
       try {
         const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`);
         const data = await res.json();
-        applyColors(data.types[0].type.name);
+        const color = typeColors[data.types[0].type.name];
+        document.documentElement.style.setProperty('--type-color', color);
 
         document.getElementById('poke-image').src = data.sprites.other['official-artwork'].front_default;
         document.getElementById('poke-name').innerText = data.name.replace(/-/g, ' ');
@@ -288,11 +291,16 @@
         let synopsis = flavor ? flavor.flavor_text.replace(/[\f\n\r]/g, ' ') : "...";
         
         if (flavor && flavor.language.name === 'en') {
-          const tr = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=pt&dt=t&q=${encodeURIComponent(synopsis)}`);
-          const trd = await tr.json(); synopsis = trd[0].map(x => x[0]).join('');
+          try {
+            const tr = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=pt&dt=t&q=${encodeURIComponent(synopsis)}`);
+            const trd = await tr.json(); synopsis = trd[0].map(x => x[0]).join('');
+          } catch(e) {}
         }
-        document.getElementById('poke-desc').innerText = `"${synopsis}"`;
-        document.getElementById('poke-rarity').innerText = spec.is_legendary ? 'Lendário' : (spec.is_mythical ? 'Mítico' : 'Comum');
+        document.getElementById('poke-desc').innerText = synopsis;
+        
+        const rarity = getRarityInfo(id);
+        document.getElementById('poke-rarity-modal').innerText = rarity.label;
+        document.getElementById('poke-rarity-modal').style.color = rarity.color;
         document.getElementById('poke-gen').innerText = genMap[spec.generation.name] || 'Desc.';
 
         fetchEvolutions(spec.evolution_chain.url);
