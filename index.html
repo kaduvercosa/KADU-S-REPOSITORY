@@ -3,89 +3,95 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Pokédex Completa</title>
+  <title>Pokédex Completa Dinâmica</title>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800;900&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     /* VARIÁVEIS E ANIMAÇÕES */
-    :root { --type-color: #2a2a2a; --type-dark: #121212; }
-    @keyframes float { 0% { transform: translateY(0px); filter: drop-shadow(0 15px 25px rgba(0,0,0,0.3)); } 50% { transform: translateY(-10px); filter: drop-shadow(0 20px 30px rgba(0,0,0,0.2)); } 100% { transform: translateY(0px); filter: drop-shadow(0 15px 25px rgba(0,0,0,0.3)); } }
+    :root { 
+      --type-color: #f0f0f0; 
+      --type-dark: #e0e0e0; 
+      --text-main: #2a2a2a;
+    }
+    
+    @keyframes float { 0% { transform: translateY(0px); filter: drop-shadow(0 10px 20px rgba(0,0,0,0.2)); } 50% { transform: translateY(-10px); filter: drop-shadow(0 15px 25px rgba(0,0,0,0.15)); } 100% { transform: translateY(0px); filter: drop-shadow(0 10px 20px rgba(0,0,0,0.2)); } }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(20px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
     @keyframes fadeInGrid { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
     
     /* ESTILO GERAL */
-    body { margin: 0; padding: 0; background: linear-gradient(135deg, var(--type-color) 0%, var(--type-dark) 100%); background-attachment: fixed; color: #ffffff; font-family: 'Poppins', sans-serif; display: flex; flex-direction: column; align-items: center; min-height: 100vh; overflow-x: hidden; transition: background 0.5s ease; }
+    body { margin: 0; padding: 0; background: linear-gradient(135deg, var(--type-color) 0%, var(--type-dark) 100%); background-attachment: fixed; color: var(--text-main); font-family: 'Poppins', sans-serif; display: flex; flex-direction: column; align-items: center; min-height: 100vh; overflow-x: hidden; transition: background 0.8s ease; }
     
     /* CABEÇALHO E BUSCA */
-    header { width: 100%; padding: 40px 20px 20px 20px; text-align: center; box-sizing: border-box; background: rgba(0,0,0,0.2); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(255,255,255,0.1); z-index: 10; position: sticky; top: 0; }
-    h1 { font-family: 'Montserrat', sans-serif; font-size: 36px; font-weight: 900; margin: 0 0 20px 0; letter-spacing: 2px; text-shadow: 0 4px 10px rgba(0,0,0,0.3); }
-    #search-input { width: 90%; max-width: 600px; padding: 18px 25px; border-radius: 25px; border: 2px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); color: white; font-family: 'Poppins', sans-serif; font-size: 16px; outline: none; transition: all 0.3s ease; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
-    #search-input:focus { border-color: rgba(255,255,255,0.6); background: rgba(255,255,255,0.2); }
+    header { width: 100%; padding: 40px 20px 20px 20px; text-align: center; box-sizing: border-box; background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(255,255,255,0.3); z-index: 10; position: sticky; top: 0; }
+    h1 { font-family: 'Montserrat', sans-serif; font-size: 36px; font-weight: 900; margin: 0 0 20px 0; letter-spacing: 2px; color: #fff; text-shadow: 0 2px 10px rgba(0,0,0,0.2); }
+    #search-input { width: 90%; max-width: 600px; padding: 18px 25px; border-radius: 25px; border: 2px solid rgba(255,255,255,0.5); background: rgba(255,255,255,0.3); backdrop-filter: blur(10px); color: var(--text-main); font-family: 'Poppins', sans-serif; font-size: 16px; outline: none; transition: all 0.3s ease; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+    #search-input::placeholder { color: rgba(0,0,0,0.5); }
+    #search-input:focus { border-color: rgba(255,255,255,0.8); background: rgba(255,255,255,0.5); box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
 
     /* GRADE DE POKÉMON */
     #pokedex-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 20px; width: 90%; max-width: 1200px; padding: 40px 0; }
-    .grid-card { background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 25px; padding: 20px; text-align: center; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 10px 20px rgba(0,0,0,0.1); display: flex; flex-direction: column; align-items: center; animation: fadeInGrid 0.5s ease backwards; }
-    .grid-card:hover { transform: translateY(-8px) scale(1.03); background: rgba(255, 255, 255, 0.2); box-shadow: 0 15px 30px rgba(0,0,0,0.2); border-color: rgba(255,255,255,0.4); }
+    .grid-card { background: rgba(255, 255, 255, 0.4); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.5); border-radius: 25px; padding: 20px; text-align: center; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 10px 20px rgba(0,0,0,0.05); display: flex; flex-direction: column; align-items: center; animation: fadeInGrid 0.5s ease backwards; }
+    .grid-card:hover { transform: translateY(-8px); background: rgba(255, 255, 255, 0.6); box-shadow: 0 15px 30px rgba(0,0,0,0.1); border-color: rgba(255,255,255,0.7); }
     .grid-card:active { transform: scale(0.95); }
-    .grid-card img { width: 100px; height: 100px; object-fit: contain; filter: drop-shadow(0 8px 10px rgba(0,0,0,0.3)); transition: transform 0.3s; }
+    .grid-card img { width: 100px; height: 100px; object-fit: contain; filter: drop-shadow(0 5px 10px rgba(0,0,0,0.15)); transition: transform 0.3s; }
     .grid-card:hover img { transform: scale(1.1); }
-    .grid-id { background: rgba(0,0,0,0.3); padding: 4px 10px; border-radius: 10px; font-size: 12px; font-weight: 800; color: #ccc; margin-top: 15px; margin-bottom: 5px; }
-    .grid-name { font-family: 'Montserrat', sans-serif; font-size: 16px; font-weight: 800; text-transform: capitalize; color: #fff; margin: 0; }
+    .grid-id { background: rgba(0,0,0,0.05); padding: 4px 10px; border-radius: 10px; font-size: 12px; font-weight: 800; color: rgba(0,0,0,0.6); margin-top: 15px; margin-bottom: 5px; }
+    .grid-name { font-family: 'Montserrat', sans-serif; font-size: 16px; font-weight: 800; text-transform: capitalize; color: var(--text-main); margin: 0; }
 
     /* MODAL */
-    #modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(8px); z-index: 100; display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; overflow-y: auto; padding: 20px; box-sizing: border-box; }
+    #modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.3); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); z-index: 100; display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: opacity 0.4s ease; overflow-y: auto; padding: 20px; box-sizing: border-box; }
     #modal-overlay.active { opacity: 1; pointer-events: auto; }
     
-    #modal-content { background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(40px); border: 1px solid rgba(255, 255, 255, 0.4); border-radius: 40px; padding: 40px; width: 100%; max-width: 900px; box-shadow: 0 30px 60px rgba(0,0,0,0.4); position: relative; display: flex; flex-direction: column; align-items: center; margin: auto; transform: translateY(20px) scale(0.95); transition: all 0.3s ease; }
+    #modal-content { background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px); border: 1px solid rgba(255, 255, 255, 0.7); border-radius: 40px; padding: 40px; width: 100%; max-width: 850px; max-height: 90vh; overflow-y: auto; box-shadow: 0 30px 60px rgba(0,0,0,0.15); position: relative; display: flex; flex-direction: column; align-items: center; margin: auto; transform: translateY(30px) scale(0.95); transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1); box-sizing: border-box; }
     #modal-overlay.active #modal-content { transform: translateY(0) scale(1); }
     
-    .close-btn { position: absolute; top: 20px; right: 20px; background: rgba(0,0,0,0.3); color: white; border: 2px solid rgba(255,255,255,0.3); width: 40px; height: 40px; border-radius: 20px; font-size: 20px; font-weight: bold; cursor: pointer; display: flex; justify-content: center; align-items: center; transition: 0.2s; z-index: 110; }
-    .close-btn:hover { background: rgba(255,255,255,0.3); transform: scale(1.1); }
+    .close-btn { position: absolute; top: 20px; right: 20px; background: rgba(255,255,255,0.5); color: var(--text-main); border: 2px solid rgba(255,255,255,0.7); width: 40px; height: 40px; border-radius: 20px; font-size: 20px; font-weight: bold; cursor: pointer; display: flex; justify-content: center; align-items: center; transition: 0.2s; z-index: 110; backdrop-filter: blur(5px); }
+    .close-btn:hover { background: rgba(255,255,255,0.8); transform: scale(1.1); }
     
     .modal-layout { display: flex; flex-direction: column; align-items: center; width: 100%; gap: 20px; }
-    .card-content { width: 100%; display: flex; flex-direction: column; align-items: center; text-align: center; }
-    #poke-image { width: 250px; height: 250px; object-fit: contain; margin-top: -30px; z-index: 10; animation: float 4s ease-in-out infinite; }
-    #poke-name { font-family: 'Montserrat', sans-serif; font-size: 40px; font-weight: 900; text-transform: capitalize; margin: 0; letter-spacing: -1px; line-height: 1.1; }
-    #poke-id { font-family: 'Montserrat', sans-serif; background: rgba(0,0,0,0.2); padding: 5px 15px; border-radius: 15px; color: #fff; font-weight: 800; font-size: 16px; margin-bottom: 20px; letter-spacing: 2px; margin-top: 10px; }
+    .card-content { width: 100%; display: flex; flex-direction: column; align-items: center; text-align: center; color: var(--text-main); }
+    #poke-image { width: 220px; height: 220px; object-fit: contain; margin-top: -20px; z-index: 10; animation: float 4s ease-in-out infinite; }
+    #poke-name { font-family: 'Montserrat', sans-serif; font-size: 36px; font-weight: 900; text-transform: capitalize; margin: 0; letter-spacing: -1px; line-height: 1.1; color: var(--text-main); }
+    #poke-id { font-family: 'Montserrat', sans-serif; background: rgba(0,0,0,0.05); padding: 5px 15px; border-radius: 15px; color: rgba(0,0,0,0.7); font-weight: 800; font-size: 16px; margin-bottom: 20px; letter-spacing: 2px; margin-top: 10px; }
     #poke-types { margin-bottom: 25px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
-    .type-badge { padding: 8px 18px; border-radius: 25px; font-weight: 800; font-size: 13px; text-transform: uppercase; border: 2px solid rgba(255,255,255,0.5); box-shadow: 0 8px 15px rgba(0,0,0,0.15); letter-spacing: 1px; }
-    #poke-desc { font-style: italic; font-weight: 500; font-size: 14px; line-height: 1.5; color: #fff; background: rgba(0,0,0,0.15); padding: 18px 22px; border-radius: 20px; border-left: 5px solid rgba(255,255,255,0.6); margin-bottom: 20px; width: 100%; box-sizing: border-box; text-align: left; }
+    .type-badge { padding: 8px 18px; border-radius: 25px; font-weight: 800; font-size: 13px; text-transform: uppercase; border: 2px solid rgba(255,255,255,0.5); box-shadow: 0 5px 15px rgba(0,0,0,0.1); color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+    #poke-desc { font-style: italic; font-weight: 500; font-size: 14px; line-height: 1.5; color: var(--text-main); background: rgba(255,255,255,0.4); padding: 18px 22px; border-radius: 20px; border-left: 5px solid var(--type-color); margin-bottom: 20px; width: 100%; box-sizing: border-box; text-align: left; transition: border-color 0.5s ease; }
     
-    .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 100%; background: rgba(255,255,255,0.15); padding: 22px; border-radius: 25px; border: 1px solid rgba(255,255,255,0.3); box-sizing: border-box; margin-bottom: 20px; }
-    .info-item { display: flex; flex-direction: column; }
-    .info-label { font-size: 11px; color: rgba(255,255,255,0.8); text-transform: uppercase; font-weight: 700; margin-bottom: 4px; }
-    .info-value { font-size: 15px; font-weight: 700; text-transform: capitalize; color: #fff; }
+    .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 100%; background: rgba(255,255,255,0.3); padding: 22px; border-radius: 25px; border: 1px solid rgba(255,255,255,0.5); box-sizing: border-box; margin-bottom: 20px; }
+    .info-label { font-size: 11px; color: rgba(0,0,0,0.6); text-transform: uppercase; font-weight: 700; margin-bottom: 4px; }
+    .info-value { font-size: 15px; font-weight: 700; text-transform: capitalize; color: var(--text-main); }
     
-    #poke-stats { width: 100%; background: rgba(255,255,255,0.15); padding: 22px; border-radius: 25px; border: 1px solid rgba(255,255,255,0.3); box-sizing: border-box; margin-bottom: 20px;}
-    #poke-stats h3 { margin: 0 0 15px 0; font-size: 15px; text-align: center; color: #fff; text-transform: uppercase; font-weight: 800; }
-    .stat-row { display: flex; align-items: center; margin-bottom: 10px; font-size: 13px; }
-    .stat-name { width: 80px; font-weight: 800; color: rgba(255,255,255,0.9); text-transform: uppercase; font-size: 11px; }
-    .stat-bar-bg { flex: 1; background: rgba(0,0,0,0.15); height: 10px; border-radius: 5px; margin: 0 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.2); }
-    .stat-bar-fill { height: 100%; border-radius: 5px; width: 0; transition: width 0.4s ease-out; }
-    .stat-value { width: 35px; text-align: right; font-weight: 900; font-size: 14px; color: #fff; }
+    #poke-stats { width: 100%; background: rgba(255,255,255,0.3); padding: 22px; border-radius: 25px; border: 1px solid rgba(255,255,255,0.5); box-sizing: border-box; margin-bottom: 20px;}
+    #poke-stats h3 { margin: 0 0 15px 0; font-size: 15px; text-align: center; color: var(--text-main); text-transform: uppercase; font-weight: 800; }
+    .stat-row { display: flex; align-items: center; margin-bottom: 10px; font-size: 13px; color: var(--text-main); }
+    .stat-name { width: 80px; font-weight: 800; color: rgba(0,0,0,0.7); text-transform: uppercase; font-size: 11px; }
+    .stat-bar-bg { flex: 1; background: rgba(0,0,0,0.05); height: 10px; border-radius: 5px; margin: 0 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.5); }
+    .stat-bar-fill { height: 100%; border-radius: 5px; width: 0; transition: width 0.5s ease-out; background-color: var(--type-color); }
+    .stat-value { width: 35px; text-align: right; font-weight: 900; font-size: 14px; color: var(--text-main); }
     
     #evolutions { width: 100%; }
     .evo-container { display: flex; justify-content: center; flex-wrap: wrap; gap: 15px; margin-top: 15px; }
-    .evo-card { background: rgba(255, 255, 255, 0.2); border: 1px solid rgba(255, 255, 255, 0.4); border-radius: 20px; padding: 15px; text-align: center; cursor: pointer; width: 90px; transition: 0.15s; }
-    .evo-card:hover { transform: translateY(-5px); background: rgba(255,255,255,0.3); }
+    .evo-card { background: rgba(255, 255, 255, 0.4); border: 1px solid rgba(255, 255, 255, 0.6); border-radius: 20px; padding: 15px; text-align: center; cursor: pointer; width: 90px; transition: 0.15s; color: var(--text-main); }
+    .evo-card:hover { transform: translateY(-5px); background: rgba(255,255,255,0.6); }
     .evo-card img { width: 70px; height: 70px; object-fit: contain; }
-    .evo-name { font-size: 12px; text-transform: capitalize; margin-top: 8px; font-weight: 800; color: #fff; }
+    .evo-name { font-size: 12px; text-transform: capitalize; margin-top: 8px; font-weight: 800; }
 
     /* Loading e Mensagens de Erro */
     .loader-container { width: 100%; text-align: center; margin-top: 50px; }
-    .loader { border: 4px solid rgba(255,255,255,0.3); border-top: 4px solid #fff; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto 20px auto; }
+    .loader { border: 4px solid rgba(0,0,0,0.1); border-top: 4px solid var(--text-main); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto 20px auto; }
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-    .error-msg { color: #ff5252; font-weight: bold; font-size: 18px; margin-top: 20px; }
+    .error-msg { color: #ff5252; font-weight: bold; font-size: 18px; margin-top: 20px; padding: 20px; background: rgba(255,255,255,0.5); border-radius: 10px;}
 
     @media (min-width: 800px) {
-      .modal-layout { flex-direction: row; align-items: stretch; gap: 40px; }
-      .card-content { flex: 1; align-items: flex-start; text-align: left; }
-      #poke-image { width: 320px; height: 320px; margin-top: 0; align-self: center; }
-      #poke-name { font-size: 50px; }
+      .modal-layout { flex-direction: row; align-items: stretch; gap: 30px; }
+      .card-content { flex: 1; align-items: flex-start; text-align: left; min-width: 0; }
+      #poke-image { width: 280px; height: 280px; margin-top: 0; align-self: center; flex-shrink: 0; }
+      #poke-name { font-size: 44px; }
       #poke-types { justify-content: flex-start; }
       .info-grid { grid-template-columns: 1fr 1fr 1fr; }
       .info-item[style] { grid-column: auto !important; }
       #poke-stats h3 { text-align: left; }
       #pokedex-grid { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
+      #modal-content { padding: 50px; }
     }
   </style>
 </head>
@@ -133,7 +139,7 @@
           </div>
           
           <div id="evolutions" style="display: none;">
-            <h3 style="text-align:center; text-transform:uppercase; font-size: 14px; letter-spacing:2px; font-weight:800;">Cadeia de Evolução</h3>
+            <h3 style="text-align:center; text-transform:uppercase; font-size: 14px; letter-spacing:2px; font-weight:800; color: var(--text-main);">Cadeia de Evolução</h3>
             <div class="evo-container" id="evo-list"></div>
           </div>
         </div>
@@ -148,7 +154,8 @@
     const genMap = { 'generation-i': '1ª Gen', 'generation-ii': '2ª Gen', 'generation-iii': '3ª Gen', 'generation-iv': '4ª Gen', 'generation-v': '5ª Gen', 'generation-vi': '6ª Gen', 'generation-vii': '7ª Gen', 'generation-viii': '8ª Gen', 'generation-ix': '9ª Gen' };
     
     let allPokemon = [];
-    const TOTAL_POKEMON = 151;
+    // AQUI ESTÁ A MUDANÇA: de 151 para 1025 (Todos os Pokémon principais)
+    const TOTAL_POKEMON = 1025;
 
     async function initPokedex() {
       try {
@@ -157,6 +164,9 @@
         const data = await res.json();
         allPokemon = data.results;
         renderGrid(allPokemon);
+        
+        setInitialDynamicBackground();
+        
         document.getElementById('main-loader-container').style.display = 'none';
       } catch (e) {
         console.error(e);
@@ -165,9 +175,24 @@
       }
     }
 
+    function setInitialDynamicBackground() {
+        const randomEntry = allPokemon[Math.floor(Math.random() * allPokemon.length)];
+        const parts = randomEntry.url.split('/');
+        const id = parts[parts.length - 2];
+        
+        fetch('https://pokeapi.co/api/v2/pokemon/' + id)
+            .then(res => res.json())
+            .then(data => {
+                applyDynamicColors(data.types[0].type.name);
+            }).catch(e => console.log("Erro ao definir fundo inicial"));
+    }
+
     function renderGrid(pokemonList) {
       const grid = document.getElementById('pokedex-grid');
       grid.innerHTML = '';
+      
+      // Criar um fragmento de documento ajuda na performance ao carregar muitos elementos
+      const fragment = document.createDocumentFragment();
       
       pokemonList.forEach((poke, index) => {
         let parts = poke.url.split('/');
@@ -175,12 +200,18 @@
         
         const card = document.createElement('div');
         card.className = 'grid-card';
-        card.style.animationDelay = (index % 20) * 0.03 + 's'; 
+        // Para mais de 1000 itens, não precisamos de atraso na animação de todos, apenas dos primeiros visíveis
+        if (index < 50) {
+            card.style.animationDelay = (index % 20) * 0.03 + 's'; 
+        }
         card.onclick = () => openPokemonModal(id);
         
+        // A tag loading="lazy" é o que permite carregar 1025 imagens sem travar o dispositivo
         card.innerHTML = '<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/' + id + '.png" loading="lazy" alt="' + poke.name + '"><div class="grid-id">#' + id.toString().padStart(3, '0') + '</div><h4 class="grid-name">' + poke.name.replace('-', ' ') + '</h4>';
-        grid.appendChild(card);
+        fragment.appendChild(card);
       });
+      
+      grid.appendChild(fragment);
     }
 
     document.getElementById('search-input').addEventListener('input', (e) => {
@@ -200,6 +231,12 @@
       return '#'+(R.toString(16).padStart(2,'0'))+(G.toString(16).padStart(2,'0'))+(B.toString(16).padStart(2,'0')); 
     }
 
+    function applyDynamicColors(typeName) {
+        const baseColor = typeColors[typeName] || '#777';
+        document.documentElement.style.setProperty('--type-color', baseColor);
+        document.documentElement.style.setProperty('--type-dark', shadeColor(baseColor, -30)); 
+    }
+
     async function openPokemonModal(id) {
       const modal = document.getElementById('modal-overlay');
       const details = document.getElementById('modal-details');
@@ -215,10 +252,7 @@
         if (!res.ok) throw new Error('Não encontrado');
         const data = await res.json();
         
-        const primaryType = data.types[0].type.name;
-        const baseColor = typeColors[primaryType] || '#777';
-        document.documentElement.style.setProperty('--type-color', baseColor);
-        document.documentElement.style.setProperty('--type-dark', shadeColor(baseColor, -40));
+        applyDynamicColors(data.types[0].type.name);
         
         document.getElementById('poke-image').src = data.sprites.other['official-artwork'].front_default;
         document.getElementById('poke-name').innerText = data.name.replace('-', ' ');
@@ -262,10 +296,10 @@
         }
         document.getElementById('poke-desc').innerText = '"' + synopsis + '"';
         
-        let rarity = 'Comum'; let rColor = '#ffffff';
-        if (speciesData.is_mythical) { rarity = 'Mítico'; rColor = '#FFE082'; } 
-        else if (speciesData.is_legendary) { rarity = 'Lendário'; rColor = '#FFF59D'; } 
-        else if (speciesData.is_baby) { rarity = 'Bebê'; rColor = '#B3E5FC'; }
+        let rarity = 'Comum'; let rColor = '#2a2a2a'; 
+        if (speciesData.is_mythical) { rarity = 'Mítico'; rColor = '#a000d0'; } 
+        else if (speciesData.is_legendary) { rarity = 'Lendário'; rColor = '#c09000'; } 
+        else if (speciesData.is_baby) { rarity = 'Bebê'; rColor = '#00a0f0'; }
         
         let rarityEl = document.getElementById('poke-rarity'); 
         rarityEl.innerText = rarity; rarityEl.style.color = rColor;
@@ -275,7 +309,7 @@
         data.stats.forEach(s => {
           let statName = statMap[s.stat.name] || s.stat.name; let pct = Math.min((s.base_stat / 200) * 100, 100);
           let row = document.createElement('div'); row.className = 'stat-row';
-          row.innerHTML = '<span class="stat-name">' + statName + '</span><div class="stat-bar-bg"><div class="stat-bar-fill" style="background: #fff; width: 0;"></div></div><span class="stat-value">' + s.base_stat + '</span>';
+          row.innerHTML = '<span class="stat-name">' + statName + '</span><div class="stat-bar-bg"><div class="stat-bar-fill" style="width: 0;"></div></div><span class="stat-value">' + s.base_stat + '</span>';
           statsList.appendChild(row); 
           setTimeout(() => { row.querySelector('.stat-bar-fill').style.width = pct + '%'; }, 100);
         });
@@ -323,8 +357,6 @@
     function forceCloseModal() {
       document.getElementById('modal-overlay').classList.remove('active');
       document.body.style.overflow = 'auto';
-      document.documentElement.style.setProperty('--type-color', '#2a2a2a');
-      document.documentElement.style.setProperty('--type-dark', '#121212');
     }
 
     initPokedex();
