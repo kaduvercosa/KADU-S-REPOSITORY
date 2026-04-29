@@ -2,8 +2,8 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>MasterDex</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MasterDex V3</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800;900&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
@@ -11,228 +11,178 @@
 :root {
   --type-color:#4A90E2;
   --type-dark:#1a1a2e;
-  --glass-bg:rgba(255,255,255,0.5);
+  --glass-bg:rgba(255,255,255,0.55);
   --glass-border:rgba(255,255,255,0.7);
   --text-main:#1a1a1a;
-  --header-bg:rgba(255,255,255,0.15);
-  --card-inner:rgba(255,255,255,0.3);
-}
-
-[data-theme="dark"] {
-  --glass-bg:rgba(30,30,45,0.7);
-  --glass-border:rgba(255,255,255,0.1);
-  --text-main:#fff;
-  --header-bg:rgba(0,0,0,0.3);
-  --card-inner:rgba(255,255,255,0.08);
+  --card-inner:rgba(255,255,255,0.25);
 }
 
 /* BASE */
 body{
 margin:0;
 background:linear-gradient(135deg,var(--type-color),var(--type-dark));
-color:var(--text-main);
 font-family:'Poppins',sans-serif;
-min-height:100vh;
+color:var(--text-main);
 overflow-x:hidden;
 }
 
 /* HEADER */
 header{
-width:100%;
-padding:25px 20px;
-text-align:center;
-background:var(--header-bg);
-backdrop-filter:blur(15px);
 position:fixed;
 top:0;
-transition:.4s;
+width:100%;
+padding:25px;
+text-align:center;
+background:rgba(255,255,255,0.15);
+backdrop-filter:blur(15px);
 z-index:100;
+transition:.4s;
 }
-
-header.hide{
-transform:translateY(-100%);
-}
+header.hide{transform:translateY(-100%);}
 
 h1{
 font-family:'Montserrat';
-font-size:28px;
 color:#fff;
-margin:0 0 10px;
+margin:0;
 }
 
-/* GRID NORMAL (corrigido tamanho gigante) */
+/* GRID */
 #pokedex-grid{
 display:grid;
-grid-template-columns:repeat(auto-fill,minmax(150px,1fr));
+grid-template-columns:repeat(auto-fill,minmax(155px,1fr));
 gap:15px;
-width:92%;
+padding:180px 20px 50px;
 max-width:1200px;
-margin:0 auto;
-padding:170px 0 50px;
+margin:auto;
 }
 
-/* CARD */
 .grid-card{
 background:var(--glass-bg);
 backdrop-filter:blur(10px);
-border:1px solid var(--glass-border);
-border-radius:22px;
-padding:18px 10px;
+border-radius:25px;
+padding:20px 10px;
 text-align:center;
 cursor:pointer;
 transition:.3s;
 }
 .grid-card:hover{transform:translateY(-5px);}
 
-.grid-card img{
-width:90px;
-height:90px;
-object-fit:contain;
+.grid-card img{width:90px;}
+
+.grid-id{font-size:10px;opacity:.5;}
+.grid-name{font-weight:800;text-transform:capitalize;}
+
+.grid-types{
+display:flex;
+justify-content:center;
+gap:5px;
+flex-wrap:wrap;
+margin-top:5px;
 }
 
-.grid-id{
+.type{
+font-size:9px;
+padding:4px 8px;
+border-radius:10px;
+color:#fff;
+font-weight:700;
+}
+
+.grid-rarity{
 font-size:10px;
 font-weight:800;
-opacity:.5;
-margin-top:8px;
-}
-
-.grid-name{
-font-family:'Montserrat';
-font-size:13px;
-font-weight:800;
-margin:4px 0;
-text-transform:capitalize;
+margin-top:5px;
 }
 
 /* MODAL */
 #modal-overlay{
 position:fixed;
 inset:0;
-background:rgba(0,0,0,.5);
+background:rgba(0,0,0,0.5);
 backdrop-filter:blur(15px);
 display:none;
-justify-content:center;
-align-items:flex-start;
-overflow-y:auto;
-padding:20px;
 z-index:3000;
+padding:20px;
 }
 #modal-overlay.active{display:flex;}
 
-/* 💎 LIQUID GLASS SEM QUEBRAR */
 #modal-content{
-position:relative;
-background:rgba(255,255,255,0.08);
-backdrop-filter:blur(45px) saturate(180%);
--webkit-backdrop-filter:blur(45px) saturate(180%);
-
-border:1px solid rgba(255,255,255,0.18);
+margin:auto;
+max-width:800px;
+width:100%;
+padding:35px;
 border-radius:40px;
 
-padding:35px;
-width:100%;
-max-width:800px;
-margin:auto;
-
-box-shadow:
-inset 0 2px 6px rgba(255,255,255,0.25),
-0 30px 80px rgba(0,0,0,0.4);
-
-overflow:hidden;
+/* 💎 LIQUID GLASS MELHORADO */
+background:rgba(255,255,255,0.08);
+backdrop-filter:blur(50px) saturate(180%);
+-webkit-backdrop-filter:blur(50px) saturate(180%);
+border:1px solid rgba(255,255,255,0.2);
+box-shadow:0 10px 40px rgba(0,0,0,0.3), inset 0 1px 1px rgba(255,255,255,0.2);
 }
 
-/* brilho */
-#modal-content::before{
-content:"";
-position:absolute;
-inset:0;
-background:linear-gradient(130deg,rgba(255,255,255,0.25),transparent 60%);
-pointer-events:none;
-}
-
-.close-btn{
-position:absolute;
-top:20px;
-right:20px;
-width:40px;
-height:40px;
-border-radius:50%;
-background:var(--card-inner);
-border:1px solid var(--glass-border);
-font-size:20px;
-cursor:pointer;
-}
-
-/* LAYOUT */
 .modal-layout{
 display:flex;
 flex-direction:column;
 align-items:center;
-gap:25px;
+gap:20px;
 }
 
 @media(min-width:800px){
-.modal-layout{
-flex-direction:row;
-align-items:flex-start;
-gap:40px;
-}
+.modal-layout{flex-direction:row;gap:40px;}
 }
 
-/* IMAGEM */
-#poke-image{
-width:clamp(200px,35vw,280px);
-}
+#poke-image{width:220px;}
 
-/* TEXTO */
 #poke-name{
 font-family:'Montserrat';
 font-size:32px;
-margin-bottom:10px;
 }
 
-#poke-desc{
-background:var(--card-inner);
-padding:20px;
-border-radius:18px;
-border-left:5px solid var(--type-color);
-line-height:1.6;
-margin:10px 0;
-}
-
-/* INFO */
+/* INFO GRID */
 .info-grid{
 display:grid;
 grid-template-columns:1fr 1fr;
-gap:12px;
+gap:10px;
 margin-top:10px;
-}
-
-@media(max-width:500px){
-.info-grid{grid-template-columns:1fr;}
 }
 
 .info-item{
 display:flex;
 justify-content:space-between;
 padding:12px;
+border-radius:12px;
 background:var(--card-inner);
-border-radius:15px;
 }
 
-/* LOADER */
-.loader{
-border:4px solid rgba(150,150,150,0.1);
-border-top:4px solid var(--text-main);
-border-radius:50%;
-width:40px;
-height:40px;
-animation:spin 1s linear infinite;
-margin:100px auto;
+.info-label{
+font-size:11px;
+opacity:.6;
 }
-@keyframes spin{to{transform:rotate(360deg)}}
 
+/* EVOLUÇÕES */
+.evo-container{
+display:flex;
+gap:10px;
+flex-wrap:wrap;
+justify-content:center;
+margin-top:15px;
+}
+
+.evo-card{
+text-align:center;
+cursor:pointer;
+}
+
+.evo-card img{width:70px;}
+
+.close-btn{
+position:absolute;
+top:20px;
+right:20px;
+cursor:pointer;
+font-size:20px;
+}
 </style>
 </head>
 
@@ -243,29 +193,28 @@ margin:100px auto;
 </header>
 
 <div id="pokedex-grid"></div>
-<div class="loader" id="main-loader"></div>
 
 <div id="modal-overlay">
 <div id="modal-content">
-<button class="close-btn" onclick="closeModal()">×</button>
+<div class="close-btn" onclick="closeModal()">✖</div>
 
 <div class="modal-layout">
-<div style="text-align:center">
+<div>
 <img id="poke-image">
-<div id="poke-id-modal" style="font-weight:800;opacity:.5;margin-top:10px"></div>
 </div>
 
-<div style="flex:1;width:100%">
+<div style="flex:1">
 <div id="poke-name"></div>
-<div id="poke-desc"></div>
+<div id="poke-types" class="grid-types"></div>
 
 <div class="info-grid">
-<div class="info-item"><span>Altura</span><span id="poke-height"></span></div>
-<div class="info-item"><span>Peso</span><span id="poke-weight"></span></div>
-<div class="info-item"><span>Raridade</span><span id="poke-rarity"></span></div>
+<div class="info-item"><span class="info-label">Altura</span><span id="poke-height"></span></div>
+<div class="info-item"><span class="info-label">Peso</span><span id="poke-weight"></span></div>
+<div class="info-item"><span class="info-label">Raridade</span><span id="poke-rarity"></span></div>
 </div>
 
-<div id="evolutions"></div>
+<div id="poke-desc"></div>
+<div id="evolutions" class="evo-container"></div>
 </div>
 </div>
 
@@ -273,81 +222,100 @@ margin:100px auto;
 </div>
 
 <script>
-let allPokemon=[];
-let lastScrollTop=0;
-
-async function init(){
-const res=await fetch('https://pokeapi.co/api/v2/pokemon?limit=1025');
-const data=await res.json();
-
-allPokemon=data.results.map(p=>({
-...p,
-id:parseInt(p.url.split('/').filter(Boolean).pop())
-}));
-
-renderGrid(allPokemon);
-document.getElementById('main-loader').style.display='none';
-}
-
-function renderGrid(list){
-const grid=document.getElementById('pokedex-grid');
-grid.innerHTML='';
-
-list.forEach(p=>{
-const card=document.createElement('div');
-card.className='grid-card';
-card.onclick=()=>openModal(p.id);
-
-card.innerHTML=`
-<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${p.id}.png">
-<div class="grid-id">#${p.id.toString().padStart(3,'0')}</div>
-<div class="grid-name">${p.name}</div>
-`;
-
-grid.appendChild(card);
-});
-}
-
-async function openModal(id){
-const overlay=document.getElementById('modal-overlay');
-overlay.classList.add('active');
-document.body.style.overflow='hidden';
-
-const data=await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`).then(r=>r.json());
-const spec=await fetch(data.species.url).then(r=>r.json());
-
-document.getElementById('poke-image').src=data.sprites.other['official-artwork'].front_default;
-document.getElementById('poke-name').innerText=data.name;
-document.getElementById('poke-id-modal').innerText='#'+id;
-
-document.getElementById('poke-height').innerText=(data.height/10)+' m';
-document.getElementById('poke-weight').innerText=(data.weight/10)+' kg';
-
-const rarity=spec.is_legendary?'Lendário':(spec.is_mythical?'Mítico':'Comum');
-document.getElementById('poke-rarity').innerText=rarity;
-
-const flavor=spec.flavor_text_entries.find(f=>f.language.name==='en');
-document.getElementById('poke-desc').innerText=flavor.flavor_text;
-}
-
-function closeModal(){
-document.getElementById('modal-overlay').classList.remove('active');
-document.body.style.overflow='auto';
-}
+const cache = new Map();
+let lastScroll=0;
 
 /* HEADER SCROLL */
 window.addEventListener('scroll',()=>{
 const header=document.getElementById('main-header');
 const current=window.pageYOffset;
+if(current>lastScroll) header.classList.add('hide');
+else header.classList.remove('hide');
+lastScroll=current;
+});
 
-if(current>lastScrollTop){
-header.classList.add('hide');
-}else{
-header.classList.remove('hide');
+/* INIT */
+async function init(){
+const res=await fetch('https://pokeapi.co/api/v2/pokemon?limit=151');
+const data=await res.json();
+
+const grid=document.getElementById('pokedex-grid');
+
+data.results.forEach(p=>{
+const id=p.url.split('/').filter(Boolean).pop();
+
+const card=document.createElement('div');
+card.className='grid-card';
+
+card.innerHTML=`
+<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${id}.png">
+<div class="grid-id">#${id}</div>
+<div class="grid-name">${p.name}</div>
+<div class="grid-rarity">Carregando...</div>
+`;
+
+card.onclick=()=>openModal(id);
+grid.appendChild(card);
+});
 }
 
-lastScrollTop=current;
+/* MODAL */
+async function openModal(id){
+const overlay=document.getElementById('modal-overlay');
+overlay.classList.add('active');
+
+let data=cache.get(id);
+
+if(!data){
+const p=await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`).then(r=>r.json());
+const s=await fetch(p.species.url).then(r=>r.json());
+data={p,s};
+cache.set(id,data);
+}
+
+const {p,s}=data;
+
+document.getElementById('poke-image').src=p.sprites.other['official-artwork'].front_default;
+document.getElementById('poke-name').innerText=p.name;
+
+document.getElementById('poke-height').innerText=(p.height/10)+' m';
+document.getElementById('poke-weight').innerText=(p.weight/10)+' kg';
+
+/* 🔥 CORREÇÃO DO ESPAÇO */
+document.getElementById('poke-rarity').innerText=
+s.is_legendary ? 'Lendário' :
+s.is_mythical ? 'Mítico' :
+'Comum';
+
+/* DESCRIÇÃO */
+const flavor=s.flavor_text_entries.find(f=>f.language.name==='en');
+document.getElementById('poke-desc').innerText=flavor.flavor_text;
+
+/* EVOLUÇÕES */
+const evoData=await fetch(s.evolution_chain.url).then(r=>r.json());
+let evos=[];
+
+function walk(c){
+evos.push(c.species);
+c.evolves_to.forEach(walk);
+}
+walk(evoData.chain);
+
+const evoDiv=document.getElementById('evolutions');
+evoDiv.innerHTML="";
+evos.forEach(e=>{
+const id=e.url.split('/').filter(Boolean).pop();
+evoDiv.innerHTML+=`
+<div class="evo-card" onclick="openModal(${id})">
+<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png">
+<div>${e.name}</div>
+</div>`;
 });
+}
+
+function closeModal(){
+document.getElementById('modal-overlay').classList.remove('active');
+}
 
 init();
 </script>
