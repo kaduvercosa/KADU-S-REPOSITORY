@@ -1,317 +1,284 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>MasterDex</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MasterDex</title>
 
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800;900&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800;900&family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
 
-  <style>
-    :root {
-      --type-color: #4A90E2;
-      --type-dark: #1a1a2e;
-      --glass-bg: rgba(255, 255, 255, 0.5);
-      --glass-border: rgba(255, 255, 255, 0.7);
-      --text-main: #1a1a1a;
-      --header-bg: rgba(255, 255, 255, 0.15);
-      --card-inner: rgba(255, 255, 255, 0.3);
-    }
+<style>
+:root{
+--type-color:#4A90E2;
+--type-dark:#1a1a2e;
+--glass-bg:rgba(255,255,255,0.5);
+--glass-border:rgba(255,255,255,0.7);
+--text-main:#1a1a1a;
+--header-bg:rgba(255,255,255,0.15);
+--card-inner:rgba(255,255,255,0.3);
+}
 
-    [data-theme="dark"] {
-      --glass-bg: rgba(30, 30, 45, 0.7);
-      --glass-border: rgba(255, 255, 255, 0.1);
-      --text-main: #ffffff;
-      --header-bg: rgba(0, 0, 0, 0.3);
-      --card-inner: rgba(255, 255, 255, 0.08);
-    }
+[data-theme="dark"]{
+--glass-bg:rgba(30,30,45,0.7);
+--glass-border:rgba(255,255,255,0.1);
+--text-main:#fff;
+--header-bg:rgba(0,0,0,0.3);
+--card-inner:rgba(255,255,255,0.08);
+}
 
-    body {
-      margin: 0;
-      font-family: 'Poppins', sans-serif;
-      background: linear-gradient(135deg, var(--type-color), var(--type-dark));
-      color: var(--text-main);
-      min-height: 100vh;
-      overflow-x: hidden;
-      transition: 0.6s;
-    }
+body{
+margin:0;
+font-family:'Poppins',sans-serif;
+background:linear-gradient(135deg,var(--type-color),var(--type-dark));
+color:var(--text-main);
+overflow-x:hidden;
+}
 
-    /* HEADER */
-    header {
-      position: fixed;
-      top: 0;
-      width: 100%;
-      padding: 25px 20px;
-      text-align: center;
-      backdrop-filter: blur(15px);
-      background: var(--header-bg);
-      transition: 0.4s;
-      z-index: 100;
-    }
+/* HEADER */
+header{
+position:fixed;
+top:0;
+width:100%;
+padding:25px;
+text-align:center;
+background:var(--header-bg);
+backdrop-filter:blur(15px);
+transition:.4s;
+z-index:100;
+}
+header.hide{transform:translateY(-100%);}
 
-    header.hide {
-      transform: translateY(-100%);
-    }
+h1{
+font-family:'Montserrat';
+color:#fff;
+margin:0 0 10px;
+}
 
-    h1 {
-      font-family: 'Montserrat';
-      font-size: 28px;
-      margin: 0 0 10px;
-      color: white;
-    }
+/* GRID */
+#pokedex-grid{
+padding:180px 15px 50px;
+display:grid;
+grid-template-columns:repeat(auto-fill,minmax(155px,1fr));
+gap:15px;
+}
 
-    .search-container {
-      display: flex;
-      gap: 10px;
-      max-width: 600px;
-      margin: auto;
-    }
+.grid-card{
+background:var(--glass-bg);
+backdrop-filter:blur(10px);
+border-radius:20px;
+padding:15px;
+text-align:center;
+cursor:pointer;
+transition:.3s;
+}
+.grid-card:hover{transform:translateY(-5px);}
 
-    input {
-      flex: 1;
-      padding: 14px;
-      border-radius: 15px;
-      border: none;
-    }
+.grid-id{font-size:11px;opacity:.5;}
+.grid-name{font-weight:800;text-transform:capitalize;}
+.grid-rarity{font-size:10px;font-weight:800;}
 
-    /* GRID */
-    #pokedex-grid {
-      padding: 180px 10px 50px;
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-      gap: 15px;
-    }
+/* MODAL */
+#modal-overlay{
+position:fixed;
+inset:0;
+display:none;
+background:rgba(0,0,0,.6);
+backdrop-filter:blur(15px);
+justify-content:center;
+padding:20px;
+z-index:3000;
+}
+#modal-overlay.active{display:flex;}
 
-    .grid-card {
-      background: var(--glass-bg);
-      backdrop-filter: blur(10px);
-      border-radius: 20px;
-      padding: 15px;
-      text-align: center;
-      cursor: pointer;
-      transition: .3s;
-    }
+#modal-content{
+position:relative;
+width:100%;
+max-width:820px;
+padding:35px;
+border-radius:40px;
 
-    .grid-card:hover {
-      transform: translateY(-5px);
-    }
+background:rgba(255,255,255,0.08);
+backdrop-filter:blur(50px) saturate(180%);
+-webkit-backdrop-filter:blur(50px) saturate(180%);
 
-    .grid-id {
-      font-size: 11px;
-      opacity: .5;
-    }
+border:1px solid rgba(255,255,255,0.2);
 
-    .grid-name {
-      font-weight: 800;
-      text-transform: capitalize;
-    }
+box-shadow:
+inset 0 2px 6px rgba(255,255,255,0.3),
+0 30px 80px rgba(0,0,0,0.5);
 
-    /* MODAL */
-    #modal-overlay {
-      position: fixed;
-      inset: 0;
-      display: none;
-      justify-content: center;
-      background: rgba(0,0,0,0.6);
-      backdrop-filter: blur(15px);
-      padding: 20px;
-      z-index: 3000;
-    }
+overflow:hidden;
+}
 
-    #modal-overlay.active {
-      display: flex;
-    }
+#modal-content::before{
+content:"";
+position:absolute;
+inset:0;
+background:linear-gradient(120deg,rgba(255,255,255,.25),transparent 60%);
+pointer-events:none;
+}
 
-    #modal-content {
-      position: relative;
-      width: 100%;
-      max-width: 820px;
-      padding: 35px;
-      border-radius: 40px;
+.modal-layout{
+display:flex;
+flex-direction:column;
+align-items:center;
+gap:30px;
+}
 
-      background: rgba(255,255,255,0.08);
-      backdrop-filter: blur(45px) saturate(180%);
-      border: 1px solid rgba(255,255,255,0.2);
+@media(min-width:800px){
+.modal-layout{
+flex-direction:row;
+align-items:flex-start;
+}
+}
 
-      box-shadow:
-        inset 0 2px 6px rgba(255,255,255,0.3),
-        0 30px 80px rgba(0,0,0,0.5);
+/* IMAGEM */
+#poke-image{
+width:clamp(180px,40vw,280px);
+}
 
-      overflow: hidden;
-    }
+/* TEXTO */
+#poke-name{
+font-family:'Montserrat';
+font-size:32px;
+margin-bottom:10px;
+}
 
-    #modal-content::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(130deg, rgba(255,255,255,.25), transparent 60%);
-    }
+#poke-desc{
+background:var(--card-inner);
+padding:22px;
+border-radius:15px;
+line-height:1.6;
+margin:10px 0;
+}
 
-    .modal-layout {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 25px;
-    }
+/* INFO GRID */
+.info-grid{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:14px;
+margin-top:15px;
+}
 
-    @media(min-width:800px){
-      .modal-layout{
-        flex-direction: row;
-      }
-    }
+@media(max-width:500px){
+.info-grid{grid-template-columns:1fr;}
+}
 
-    #poke-image {
-      width: clamp(180px,40vw,280px);
-    }
+.info-item{
+background:var(--card-inner);
+padding:12px;
+border-radius:12px;
+display:flex;
+justify-content:space-between;
+}
 
-    #poke-name {
-      font-family: 'Montserrat';
-      font-size: 32px;
-      margin-bottom: 10px;
-    }
+/* BOTÃO */
+.close-btn{
+position:absolute;
+top:15px;
+right:20px;
+font-size:22px;
+cursor:pointer;
+}
 
-    #poke-desc {
-      background: var(--card-inner);
-      padding: 20px;
-      border-radius: 15px;
-      margin: 10px 0;
-      line-height: 1.6;
-    }
-
-    .info-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
-
-    @media(max-width:500px){
-      .info-grid{
-        grid-template-columns:1fr;
-      }
-    }
-
-    .info-item {
-      background: var(--card-inner);
-      padding: 10px;
-      border-radius: 12px;
-      display:flex;
-      justify-content:space-between;
-    }
-
-    .close-btn {
-      position: absolute;
-      top: 15px;
-      right: 20px;
-      cursor: pointer;
-      font-size: 22px;
-    }
-  </style>
+</style>
 </head>
 
 <body>
 
 <header id="main-header">
-  <h1>MASTERDEX</h1>
-  <div class="search-container">
-    <input id="search-input" placeholder="Buscar Pokémon...">
-  </div>
+<h1>MASTERDEX</h1>
 </header>
 
 <div id="pokedex-grid"></div>
 
 <div id="modal-overlay">
-  <div id="modal-content">
-    <div class="close-btn" onclick="forceCloseModal()">×</div>
+<div id="modal-content">
+<div class="close-btn" onclick="closeModal()">×</div>
 
-    <div class="modal-layout">
-      <img id="poke-image">
+<div class="modal-layout">
+<img id="poke-image">
 
-      <div>
-        <div id="poke-name"></div>
-        <div id="poke-desc"></div>
+<div style="flex:1">
+<div id="poke-name"></div>
+<div id="poke-desc"></div>
 
-        <div class="info-grid">
-          <div class="info-item"><span>Altura</span><span id="poke-height"></span></div>
-          <div class="info-item"><span>Peso</span><span id="poke-weight"></span></div>
-          <div class="info-item"><span>Raridade</span><span id="poke-rarity"></span></div>
-        </div>
-      </div>
-    </div>
+<div class="info-grid">
+<div class="info-item"><span>Altura</span><span id="poke-height"></span></div>
+<div class="info-item"><span>Peso</span><span id="poke-weight"></span></div>
+<div class="info-item"><span>Raridade</span><span id="poke-rarity"></span></div>
+</div>
+</div>
+</div>
 
-  </div>
+</div>
 </div>
 
 <script>
 let allPokemon=[];
-let lastScrollTop=0;
+let lastScroll=0;
 
 async function init(){
-  const res=await fetch('https://pokeapi.co/api/v2/pokemon?limit=200');
-  const data=await res.json();
+const res=await fetch('https://pokeapi.co/api/v2/pokemon?limit=300');
+const data=await res.json();
 
-  allPokemon=data.results.map(p=>{
-    let id=p.url.split('/').filter(Boolean).pop();
-    return {name:p.name,id};
-  });
+allPokemon=data.results.map(p=>{
+let id=p.url.split('/').filter(Boolean).pop();
+return{name:p.name,id};
+});
 
-  render(allPokemon);
+render(allPokemon);
 }
 
 function render(list){
-  const grid=document.getElementById('pokedex-grid');
-  grid.innerHTML="";
+const grid=document.getElementById('pokedex-grid');
+grid.innerHTML="";
 
-  list.forEach(p=>{
-    grid.innerHTML+=`
-      <div class="grid-card" onclick="openModal(${p.id})">
-        <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${p.id}.png">
-        <div class="grid-id">#${p.id}</div>
-        <div class="grid-name">${p.name}</div>
-      </div>
-    `;
-  });
+list.forEach(p=>{
+grid.innerHTML+=`
+<div class="grid-card" onclick="openModal(${p.id})">
+<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${p.id}.png">
+<div class="grid-id">#${p.id}</div>
+<div class="grid-name">${p.name}</div>
+</div>`;
+});
 }
-
-document.getElementById('search-input').oninput=(e)=>{
-  const v=e.target.value.toLowerCase();
-  render(allPokemon.filter(p=>p.name.includes(v)));
-};
 
 async function openModal(id){
-  const overlay=document.getElementById('modal-overlay');
-  overlay.classList.add('active');
+const overlay=document.getElementById('modal-overlay');
+overlay.classList.add('active');
 
-  const p=await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`).then(r=>r.json());
-  const s=await fetch(p.species.url).then(r=>r.json());
+const p=await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`).then(r=>r.json());
+const s=await fetch(p.species.url).then(r=>r.json());
 
-  document.getElementById('poke-image').src=p.sprites.other['official-artwork'].front_default;
-  document.getElementById('poke-name').innerText=p.name;
+document.getElementById('poke-image').src=p.sprites.other['official-artwork'].front_default;
+document.getElementById('poke-name').innerText=p.name;
 
-  document.getElementById('poke-height').innerText=(p.height/10)+' m';
-  document.getElementById('poke-weight').innerText=(p.weight/10)+' kg';
+document.getElementById('poke-height').innerText=(p.height/10)+' m';
+document.getElementById('poke-weight').innerText=(p.weight/10)+' kg';
 
-  const r=s.is_legendary?'Lendário':(s.is_mythical?'Mítico':'Comum');
-  document.getElementById('poke-rarity').innerText=r;
+const rarity=s.is_legendary?'Lendário':(s.is_mythical?'Mítico':'Comum');
+document.getElementById('poke-rarity').innerText=rarity;
 
-  const d=s.flavor_text_entries.find(f=>f.language.name==='en');
-  document.getElementById('poke-desc').innerText=d.flavor_text;
+const desc=s.flavor_text_entries.find(f=>f.language.name==='en');
+document.getElementById('poke-desc').innerText=desc.flavor_text;
 }
 
-function forceCloseModal(){
-  document.getElementById('modal-overlay').classList.remove('active');
+function closeModal(){
+document.getElementById('modal-overlay').classList.remove('active');
 }
 
-window.addEventListener("scroll",()=>{
-  const header=document.getElementById("main-header");
-  const current=window.pageYOffset;
+window.addEventListener('scroll',()=>{
+const header=document.getElementById('main-header');
+const current=window.pageYOffset;
 
-  if(current>lastScrollTop){
-    header.classList.add("hide");
-  }else{
-    header.classList.remove("hide");
-  }
+if(current>lastScroll){
+header.classList.add('hide');
+}else{
+header.classList.remove('hide');
+}
 
-  lastScrollTop=current;
+lastScroll=current;
 });
 
 init();
