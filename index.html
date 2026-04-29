@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pokedex Pro - Ultimate Theme Edition</title>
+    <title>Pokedex Pro - Ultimate Eduardo</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -29,34 +29,32 @@
     </script>
 
     <style>
-        /* Transicao suave de cores */
         * { transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease; }
-        
         body { font-family: 'Montserrat', sans-serif; -webkit-tap-highlight-color: transparent; }
         
-        /* Grid inteligente para PC e Mobile */
         .pokedex-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(155px, 1fr));
             gap: 12px;
             width: 100%;
         }
         @media (min-width: 1024px) {
-            .pokedex-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 24px; }
+            .pokedex-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; }
         }
 
-        .modal-overlay { backdrop-filter: blur(12px); z-index: 100; }
+        .modal-overlay { backdrop-filter: blur(15px); z-index: 100; }
         .hide-scroll::-webkit-scrollbar { display: none; }
-        .stat-bar { height: 8px; border-radius: 4px; overflow: hidden; }
+        .stat-bar { height: 7px; border-radius: 4px; overflow: hidden; }
         .stat-fill { height: 100%; transition: width 1s ease-out; }
         
-        /* Cores de Raridade */
         .tag-rare { font-size: 8px; font-weight: 800; padding: 2px 6px; border-radius: 4px; text-transform: uppercase; }
-        .legendary { background: #facc15; color: #000; box-shadow: 0 0 10px rgba(250, 204, 21, 0.4); }
-        .mythical { background: #a855f7; color: #fff; box-shadow: 0 0 10px rgba(168, 85, 247, 0.4); }
+        .legendary { background: #facc15; color: #000; box-shadow: 0 0 8px rgba(250, 204, 21, 0.4); }
+        .mythical { background: #a855f7; color: #fff; box-shadow: 0 0 8px rgba(168, 85, 247, 0.4); }
+        
+        .var-badge { font-size: 7px; font-weight: 900; padding: 1px 4px; border-radius: 3px; position: absolute; bottom: 4px; right: 4px; }
     </style>
 </head>
-<body>
+<body class="bg-slate-100 text-slate-900">
     <div id="root"></div>
 
     <script type="text/babel">
@@ -96,7 +94,8 @@
         };
 
         function App() {
-            const [theme, setTheme] = useState('dark');
+            // TEMA PADRAO: CLARO
+            const [theme, setTheme] = useState('light');
             const [pokemonList, setPokemonList] = useState([]);
             const [loading, setLoading] = useState(true);
             const [search, setSearch] = useState('');
@@ -121,12 +120,12 @@
                     }));
                     setPokemonList(list);
                     setLoading(false);
-                    loadFullData(list);
+                    loadBackgroundData(list);
                 };
                 fetchInit();
             }, []);
 
-            const loadFullData = async (list) => {
+            const loadBackgroundData = async (list) => {
                 for (let i = 0; i < list.length; i += 50) {
                     const batch = list.slice(i, i + 50);
                     const details = await Promise.all(batch.map(async p => {
@@ -170,7 +169,11 @@
                     const varieties = await Promise.all(spData.varieties.map(async v => {
                         const vR = await fetch(v.pokemon.url);
                         const vD = await vR.json();
-                        return { name: v.pokemon.name, id: vD.id, img: vD.sprites.other['official-artwork'].front_default || vD.sprites.front_default };
+                        return { 
+                            name: v.pokemon.name, 
+                            id: vD.id, 
+                            img: vD.sprites.other['official-artwork'].front_default || vD.sprites.front_default 
+                        };
                     }));
                     chain.push({ name, varieties });
                     curr = curr.evolves_to[0];
@@ -201,33 +204,33 @@
                 <div className={`min-h-screen ${theme === 'dark' ? 'bg-slate-950 text-white' : 'bg-slate-100 text-slate-900'}`}>
                     {/* Header com Toggle e Filtros */}
                     <header className={`sticky top-0 z-50 border-b p-4 md:p-6 backdrop-blur-md ${theme === 'dark' ? 'bg-slate-950/90 border-slate-800' : 'bg-white/90 border-slate-200'}`}>
-                        <div className="max-w-[1600px] mx-auto">
+                        <div className="max-w-[1700px] mx-auto">
                             <div className="flex justify-between items-center mb-6">
                                 <h1 className="text-2xl font-kanit font-bold tracking-tighter">POKEDEX<span className="text-yellow-400">PRO</span></h1>
                                 <button 
                                     onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-                                    className={`px-4 py-2 rounded-xl font-bold text-xs uppercase tracking-widest ${theme === 'dark' ? 'bg-white text-black' : 'bg-slate-900 text-white'}`}
+                                    className={`px-5 py-2.5 rounded-2xl font-bold text-[10px] uppercase tracking-widest shadow-lg ${theme === 'dark' ? 'bg-white text-black' : 'bg-slate-900 text-white'}`}
                                 >
-                                    {theme === 'dark' ? '☀️ Modo Claro' : '🌙 Modo Escuro'}
+                                    {theme === 'dark' ? '☀️ MODO CLARO' : '🌙 MODO ESCURO'}
                                 </button>
                             </div>
                             
-                            <div className="flex flex-wrap gap-3">
+                            <div className="flex flex-wrap gap-2 md:gap-3">
                                 <input 
                                     type="text" 
                                     placeholder="Nome ou ID..."
-                                    className={`flex-1 min-w-[200px] p-3 rounded-xl text-sm outline-none border focus:ring-2 ring-yellow-400 ${theme === 'dark' ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-300'}`}
+                                    className={`flex-1 min-w-[180px] p-3.5 rounded-2xl text-sm outline-none border focus:ring-2 ring-yellow-400 ${theme === 'dark' ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-200 shadow-sm'}`}
                                     onChange={e => setSearch(e.target.value)}
                                 />
-                                <select className={`p-3 rounded-xl text-sm font-bold border outline-none ${theme === 'dark' ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-300'}`} onChange={e => setTypeF(e.target.value)}>
+                                <select className={`p-3.5 rounded-2xl text-xs font-bold border outline-none ${theme === 'dark' ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-200 shadow-sm'}`} onChange={e => setTypeF(e.target.value)}>
                                     <option value="todos">Todos Tipos</option>
                                     {Object.keys(TRANSLATIONS.types).map(k => <option key={k} value={k}>{TRANSLATIONS.types[k]}</option>)}
                                 </select>
-                                <select className={`p-3 rounded-xl text-sm font-bold border outline-none ${theme === 'dark' ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-300'}`} onChange={e => setGenF(e.target.value)}>
+                                <select className={`p-3.5 rounded-2xl text-xs font-bold border outline-none ${theme === 'dark' ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-200 shadow-sm'}`} onChange={e => setGenF(e.target.value)}>
                                     <option value="todos">Geracoes</option>
                                     {Object.keys(GENERATIONS).map(k => <option key={k} value={k}>{GENERATIONS[k].name}</option>)}
                                 </select>
-                                <select className={`p-3 rounded-xl text-sm font-bold border outline-none text-yellow-500 ${theme === 'dark' ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-300'}`} onChange={e => setRareF(e.target.value)}>
+                                <select className={`p-3.5 rounded-2xl text-xs font-bold border outline-none text-yellow-500 ${theme === 'dark' ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-200 shadow-sm'}`} onChange={e => setRareF(e.target.value)}>
                                     <option value="todos">Raridades</option>
                                     <option value="comum">Comum</option>
                                     <option value="lendario">Lendario</option>
@@ -237,18 +240,18 @@
                         </div>
                     </header>
 
-                    <main className="max-w-[1600px] mx-auto p-4 md:p-8">
+                    <main className="max-w-[1700px] mx-auto p-4 md:p-8">
                         <div className="pokedex-grid">
                             {filtered.map(p => (
-                                <div key={p.id} onClick={() => loadDetails(p.id)} className={`rounded-3xl p-5 cursor-pointer border flex flex-col items-center hover:-translate-y-2 transition-all ${theme === 'dark' ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200 shadow-sm'}`}>
+                                <div key={p.id} onClick={() => loadDetails(p.id)} className={`rounded-[32px] p-5 cursor-pointer border flex flex-col items-center hover:-translate-y-2 transition-all ${theme === 'dark' ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100 shadow-md'}`}>
                                     <div className="w-full flex justify-between items-start mb-2">
-                                        <span className="text-[10px] font-bold text-slate-500">#{p.id}</span>
+                                        <span className="text-[10px] font-bold text-slate-400">#{p.id}</span>
                                         {p.rarity && p.rarity !== 'comum' && <span className={`tag-rare ${p.rarity === 'lendario' ? 'legendary' : 'mythical'}`}>{p.rarity}</span>}
                                     </div>
-                                    <img src={p.img} className="w-24 h-24 md:w-32 md:h-32 object-contain my-2 drop-shadow-xl" loading="lazy" />
-                                    <h2 className={`text-sm font-kanit font-bold capitalize mt-2 ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>{p.name}</h2>
-                                    <div className="flex flex-wrap justify-center gap-1 mt-3">
-                                        {p.types?.map(t => <span key={t} className={`${COLORS[t]} px-2 py-0.5 rounded-md text-[8px] font-bold uppercase text-white`}>{TRANSLATIONS.types[t]}</span>)}
+                                    <img src={p.img} className="w-28 h-28 md:w-36 md:h-36 object-contain my-2 drop-shadow-2xl" loading="lazy" />
+                                    <h2 className={`text-sm md:text-base font-kanit font-bold capitalize mt-3 ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>{p.name}</h2>
+                                    <div className="flex flex-wrap justify-center gap-1.5 mt-4">
+                                        {p.types?.map(t => <span key={t} className={`${COLORS[t]} px-2.5 py-1 rounded-lg text-[8px] font-bold uppercase text-white shadow-sm`}>{TRANSLATIONS.types[t]}</span>)}
                                     </div>
                                 </div>
                             ))}
@@ -257,31 +260,31 @@
 
                     {selected && (
                         <div className="fixed inset-0 modal-overlay flex items-end md:items-center justify-center p-0 md:p-4" onClick={() => setSelected(null)}>
-                            <div className={`w-full max-w-5xl max-h-[92vh] md:rounded-[40px] rounded-t-[30px] overflow-y-auto border shadow-2xl relative ${theme === 'dark' ? 'bg-slate-950 border-slate-800' : 'bg-white border-slate-200'}`} onClick={e => e.stopPropagation()}>
-                                <div className={`sticky top-0 p-4 border-b flex justify-between items-center z-50 backdrop-blur-md ${theme === 'dark' ? 'bg-slate-950/90 border-slate-800' : 'bg-white/90 border-slate-200'}`}>
+                            <div className={`w-full max-w-5xl max-h-[92vh] md:rounded-[48px] rounded-t-[40px] overflow-y-auto border shadow-2xl relative ${theme === 'dark' ? 'bg-slate-950 border-slate-800' : 'bg-white border-slate-200'}`} onClick={e => e.stopPropagation()}>
+                                <div className={`sticky top-0 p-5 border-b flex justify-between items-center z-50 backdrop-blur-md ${theme === 'dark' ? 'bg-slate-950/90 border-slate-800' : 'bg-white/90 border-slate-200'}`}>
                                     <button onClick={() => setSelected(null)} className="text-yellow-500 font-bold text-xs uppercase tracking-widest">← Voltar</button>
-                                    <span className={`tag-rare ${selected.rarity === 'lendario' ? 'legendary' : selected.rarity === 'mitico' ? 'mythical' : 'bg-slate-200 text-slate-700'}`}>{selected.rarity}</span>
+                                    <span className={`tag-rare ${selected.rarity === 'lendario' ? 'legendary' : selected.rarity === 'mitico' ? 'mythical' : 'bg-slate-200 text-slate-600'}`}>{selected.rarity}</span>
                                 </div>
 
-                                <div className="p-6 md:p-12 flex flex-col md:flex-row gap-10">
+                                <div className="p-6 md:p-12 flex flex-col md:flex-row gap-12">
                                     <div className="w-full md:w-1/3 text-center">
-                                        <div className={`rounded-[40px] p-6 mb-6 border ${theme === 'dark' ? 'bg-slate-900 border-slate-800' : 'bg-slate-50 border-slate-100'}`}>
-                                            <img src={selected.sprites.other['official-artwork'].front_default} className="w-48 h-48 md:w-full mx-auto drop-shadow-2xl" />
+                                        <div className={`rounded-[40px] p-8 mb-6 border ${theme === 'dark' ? 'bg-slate-900 border-slate-800' : 'bg-slate-50 border-slate-100'}`}>
+                                            <img src={selected.sprites.other['official-artwork'].front_default} className="w-52 h-52 md:w-full mx-auto drop-shadow-2xl" />
                                         </div>
                                         <h2 className="text-4xl font-kanit font-bold capitalize mb-4">{selected.name}</h2>
-                                        <div className="flex justify-center gap-2">
-                                            {selected.types.map(t => <span key={t.type.name} className={`${COLORS[t.type.name]} px-4 py-1 rounded-xl text-[10px] font-bold uppercase text-white shadow-md`}>{TRANSLATIONS.types[t.type.name]}</span>)}
+                                        <div className="flex justify-center gap-2 mb-6">
+                                            {selected.types.map(t => <span key={t.type.name} className={`${COLORS[t.type.name]} px-5 py-1.5 rounded-xl text-[10px] font-bold uppercase text-white shadow-xl`}>{TRANSLATIONS.types[t.type.name]}</span>)}
                                         </div>
                                     </div>
 
                                     <div className="flex-1">
-                                        <p className={`text-sm italic mb-8 border-l-4 pl-4 ${theme === 'dark' ? 'text-slate-400 border-slate-700' : 'text-slate-600 border-slate-200'}`}>"{selected.desc}"</p>
+                                        <p className={`text-sm italic mb-10 border-l-4 pl-4 leading-relaxed ${theme === 'dark' ? 'text-slate-400 border-slate-700' : 'text-slate-600 border-slate-200'}`}>"{selected.desc}"</p>
                                         
                                         <h3 className="text-yellow-500 font-kanit font-bold text-[10px] tracking-widest mb-6 uppercase">Estatisticas</h3>
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 mb-10">
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-5 mb-12">
                                             {selected.stats.map(s => (
                                                 <div key={s.stat.name}>
-                                                    <div className="flex justify-between text-[10px] font-bold uppercase mb-1">
+                                                    <div className="flex justify-between text-[10px] font-bold uppercase mb-1.5">
                                                         <span className="text-slate-500">{TRANSLATIONS.stats[s.stat.name] || s.stat.name}</span>
                                                         <span>{s.base_stat}</span>
                                                     </div>
@@ -292,21 +295,37 @@
                                             ))}
                                         </div>
 
-                                        <h3 className="text-yellow-500 font-kanit font-bold text-[10px] tracking-widest mb-6 uppercase">Evolucoes e Variacoes</h3>
-                                        <div className="space-y-8">
+                                        <h3 className="text-yellow-500 font-kanit font-bold text-[10px] tracking-widest mb-8 uppercase">Linha Evolutiva & Variacoes</h3>
+                                        <div className="space-y-10">
                                             {evoChain.map((step, i) => (
                                                 <div key={step.name} className="flex flex-col gap-4">
-                                                    <div className="flex items-center gap-2">
+                                                    <div className="flex items-center gap-3">
                                                         <span className="text-[9px] font-bold text-slate-500 uppercase">Estagio {i + 1}</span>
                                                         <div className={`h-px flex-1 ${theme === 'dark' ? 'bg-slate-800' : 'bg-slate-100'}`}></div>
                                                     </div>
-                                                    <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
-                                                        {step.varieties.map(v => (
-                                                            <div key={v.id} onClick={() => loadDetails(v.id)} className={`cursor-pointer group p-2 rounded-2xl border transition-all ${v.id === selected.id ? 'border-yellow-400 bg-yellow-400/5 shadow-lg shadow-yellow-400/10' : theme === 'dark' ? 'border-slate-800 bg-slate-900/50 hover:border-slate-600' : 'border-slate-100 bg-slate-50 hover:border-slate-200'}`}>
-                                                                <img src={v.img} className="w-12 h-12 mx-auto group-hover:scale-110 transition-transform" />
-                                                                <p className="text-[8px] font-bold capitalize mt-2 text-center text-slate-500 truncate">{v.name.replace(/-/g, ' ')}</p>
-                                                            </div>
-                                                        ))}
+                                                    <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-4">
+                                                        {step.varieties.map(v => {
+                                                            // LOGICA DE TAGS NAS VARIACOES
+                                                            let badge = "";
+                                                            if(v.name.includes("-mega")) badge = "MEGA";
+                                                            if(v.name.includes("-gmax")) badge = "G-MAX";
+                                                            if(v.name.includes("-alola")) badge = "ALOLA";
+                                                            if(v.name.includes("-galar")) badge = "GALAR";
+                                                            if(v.name.includes("-hisui")) badge = "HISUI";
+                                                            if(v.name.includes("-paldea")) badge = "PALDEA";
+
+                                                            return (
+                                                                <div key={v.id} onClick={() => loadDetails(v.id)} className={`cursor-pointer group relative p-3 rounded-2xl border transition-all ${v.id === selected.id ? 'border-yellow-400 bg-yellow-400/5' : theme === 'dark' ? 'border-slate-800 bg-slate-900/50 hover:border-slate-600' : 'border-slate-100 bg-slate-50 hover:border-slate-200'}`}>
+                                                                    <img src={v.img} className="w-14 h-14 mx-auto group-hover:scale-110 transition-transform" />
+                                                                    <p className="text-[8px] font-bold capitalize mt-3 text-center text-slate-500 truncate">{v.name.replace(/-/g, ' ')}</p>
+                                                                    {badge && (
+                                                                        <span className={`var-badge ${badge === 'G-MAX' ? 'bg-red-500' : badge === 'MEGA' ? 'bg-blue-500' : 'bg-slate-700'} text-white`}>
+                                                                            {badge}
+                                                                        </span>
+                                                                    )}
+                                                                </div>
+                                                            );
+                                                        })}
                                                     </div>
                                                 </div>
                                             ))}
