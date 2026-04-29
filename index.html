@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pokedex Pro - Eduardo Ultimate Edition</title>
+    <title>Pokedex Pro - Eduardo Advanced Edition</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -18,6 +18,15 @@
         tailwind.config = {
             theme: {
                 extend: {
+                    colors: {
+                        slate: {
+                            50: '#f8fafc',
+                            100: '#f1f5f9',
+                            800: '#1e293b',
+                            900: '#0f172a',
+                            950: '#020617',
+                        }
+                    },
                     fontFamily: {
                         kanit: ['Kanit', 'sans-serif'],
                         montserrat: ['Montserrat', 'sans-serif'],
@@ -31,22 +40,24 @@
     </script>
 
     <style>
-        body { background-color: #020617; color: white; font-family: 'Montserrat', sans-serif; -webkit-tap-highlight-color: transparent; }
+        /* TEMA CLARO DEFINIDO */
+        body { background-color: #f8fafc; color: #0f172a; font-family: 'Montserrat', sans-serif; -webkit-tap-highlight-color: transparent; }
         
-        /* Grid responsivo que nao buga no PC */
+        /* Grid responsivo e otimizado */
         .pokedex-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-            gap: 12px;
+            gap: 16px;
             width: 100%;
         }
         @media (min-width: 1024px) {
-            .pokedex-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; }
+            .pokedex-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 24px; }
         }
 
+        /* Card Visual Light Theme */
         .pokemon-card { 
-            background: #0f172a;
-            border: 1px solid #1e293b;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
             overflow: hidden;
@@ -54,24 +65,24 @@
         .pokemon-card:hover {
             transform: translateY(-8px);
             border-color: #facc15;
-            box-shadow: 0 15px 30px -10px rgba(250, 204, 21, 0.3);
+            box-shadow: 0 15px 30px -10px rgba(0, 0, 0, 0.1);
         }
 
-        .modal-overlay { backdrop-filter: blur(20px); background: rgba(0,0,0,0.9); z-index: 100; }
+        .modal-overlay { backdrop-filter: blur(25px); background: rgba(15, 23, 42, 0.85); z-index: 100; }
         .hide-scroll::-webkit-scrollbar { display: none; }
-        .stat-bar { height: 6px; background: #1e293b; border-radius: 3px; }
+        .stat-bar { height: 8px; background: #e2e8f0; border-radius: 4px; overflow: hidden; }
         .stat-fill { height: 100%; transition: width 1s ease-out; }
         
-        .rarity-tag { font-size: 8px; font-weight: 900; padding: 2px 6px; border-radius: 4px; text-transform: uppercase; }
-        .legendary { background: #facc15; color: #000; }
-        .mythical { background: #a855f7; color: #fff; }
+        .tag-special { font-size: 9px; font-weight: 800; padding: 3px 8px; border-radius: 6px; text-transform: uppercase; }
+        .gmax { background: linear-gradient(45deg, #ff0000, #ff7b00); color: #fff; }
+        .mega { background: linear-gradient(45deg, #00c6ff, #0072ff); color: #fff; }
     </style>
 </head>
 <body>
     <div id="root"></div>
 
     <script type="text/babel">
-        const { useState, useEffect, useMemo } = React;
+        const { useState, useEffect, useMemo, useRef, useCallback } = React;
 
         const TRANSLATIONS = {
             types: {
@@ -81,18 +92,29 @@
                 ice: 'Gelo', dragon: 'Dragao', steel: 'Aco', flying: 'Voador', dark: 'Sombrio'
             },
             stats: {
-                hp: 'Vida', attack: 'Atk', defense: 'Def', 
+                hp: 'Vida', attack: 'Ataque', defense: 'Defesa', 
                 'special-attack': 'Atk Esp', 'special-defense': 'Def Esp', speed: 'Veloc'
             }
         };
 
         const COLORS = {
-            fire: 'bg-red-500', water: 'bg-blue-500', grass: 'bg-green-500', 
-            bug: 'bg-lime-600', normal: 'bg-slate-400', poison: 'bg-purple-500', 
-            electric: 'bg-yellow-400', ground: 'bg-amber-600', fairy: 'bg-pink-400', 
-            fighting: 'bg-orange-700', psychic: 'bg-rose-400', rock: 'bg-stone-600', 
-            ghost: 'bg-indigo-800', ice: 'bg-cyan-300', dragon: 'bg-violet-600',
-            steel: 'bg-gray-500', flying: 'bg-sky-400', dark: 'bg-gray-800'
+            fire: 'bg-red-500', water: 'bg-blue-500', grass: 'bg-green-500', bug: 'bg-lime-600', 
+            normal: 'bg-slate-400', poison: 'bg-purple-500', electric: 'bg-yellow-400', ground: 'bg-amber-600', 
+            fairy: 'bg-pink-400', fighting: 'bg-orange-700', psychic: 'bg-rose-400', rock: 'bg-stone-600', 
+            ghost: 'bg-indigo-800', ice: 'bg-cyan-300', dragon: 'bg-violet-600', steel: 'bg-gray-500', 
+            flying: 'bg-sky-400', dark: 'bg-slate-900'
+        };
+
+        const GENERATIONS = {
+            'gen1': { name: 'Gen 1 (Kanto)', range: [1, 151] },
+            'gen2': { name: 'Gen 2 (Johto)', range: [152, 251] },
+            'gen3': { name: 'Gen 3 (Hoenn)', range: [252, 386] },
+            'gen4': { name: 'Gen 4 (Sinnoh)', range: [387, 493] },
+            'gen5': { name: 'Gen 5 (Unova)', range: [494, 649] },
+            'gen6': { name: 'Gen 6 (Kalos)', range: [650, 721] },
+            'gen7': { name: 'Gen 7 (Alola)', range: [722, 809] },
+            'gen8': { name: 'Gen 8 (Galar)', range: [810, 905] },
+            'gen9': { name: 'Gen 9 (Paldea)', range: [906, 1025] }
         };
 
         function App() {
@@ -100,29 +122,34 @@
             const [loading, setLoading] = useState(true);
             const [search, setSearch] = useState('');
             const [typeFilter, setTypeFilter] = useState('todos');
-            const [rarityFilter, setRarityFilter] = useState('todos');
+            const [genFilter, setGenFilter] = useState('todos');
             const [selected, setSelected] = useState(null);
             const [evoChain, setEvoChain] = useState([]);
 
             useEffect(() => {
                 const fetchBase = async () => {
-                    const res = await fetch('https://pokeapi.co/api/v2/pokemon?limit=1025');
-                    const data = await res.json();
-                    const list = data.results.map((p, i) => ({
-                        name: p.name,
-                        id: i + 1,
-                        img: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${i + 1}.png`
-                    }));
-                    setPokemonList(list);
-                    setLoading(false);
-                    loadFullMetadata(list);
+                    setLoading(true);
+                    try {
+                        // Carrega os nomes e IDs basicos imediatamente
+                        const res = await fetch('https://pokeapi.co/api/v2/pokemon?limit=1025');
+                        const data = await res.json();
+                        const list = data.results.map((p, i) => ({
+                            name: p.name,
+                            id: i + 1,
+                            img: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${i + 1}.png`
+                        }));
+                        setPokemonList(list);
+                        setLoading(false);
+                        // Carrega tipos e raridade em background
+                        loadMetadataInBackground(list);
+                    } catch (e) { console.error(e); setLoading(false); }
                 };
                 fetchBase();
             }, []);
 
-            const loadFullMetadata = async (list) => {
-                for (let i = 0; i < list.length; i += 50) {
-                    const batch = list.slice(i, i + 50);
+            const loadMetadataInBackground = async (list) => {
+                for (let i = 0; i < list.length; i += 60) {
+                    const batch = list.slice(i, i + 60);
                     const details = await Promise.all(batch.map(async p => {
                         try {
                             const r = await fetch(`https://pokeapi.co/api/v2/pokemon/${p.id}`);
@@ -132,13 +159,17 @@
                             return { 
                                 ...p, 
                                 types: d.types.map(t => t.type.name),
-                                rarity: sd.is_mythical ? 'mitico' : sd.is_legendary ? 'lendario' : 'comum'
+                                isLegendary: sd.is_legendary,
+                                isMythical: sd.is_mythical
                             };
                         } catch { return p; }
                     }));
                     setPokemonList(prev => {
                         const copy = [...prev];
-                        details.forEach(d => { copy[d.id - 1] = d; });
+                        details.forEach(d => {
+                            const idx = copy.findIndex(item => item.id === d.id);
+                            if (idx !== -1) copy[idx] = d;
+                        });
                         return copy;
                     });
                 }
@@ -159,23 +190,27 @@
                         const name = curr.species.name;
                         const spRes = await fetch(`https://pokeapi.co/api/v2/pokemon-species/${name}`);
                         const spData = await spRes.json();
+                        
                         const varieties = await Promise.all(spData.varieties.map(async v => {
                             const vR = await fetch(v.pokemon.url);
                             const vD = await vR.json();
                             return {
                                 name: v.pokemon.name,
                                 id: vD.id,
+                                isDefault: v.is_default,
                                 img: vD.sprites.other['official-artwork'].front_default || vD.sprites.front_default
                             };
                         }));
+
                         chain.push({ name, varieties });
                         curr = curr.evolves_to[0];
                     }
                     setEvoChain(chain);
                     setSelected({
                         ...data,
-                        rarity: sData.is_mythical ? 'mitico' : sData.is_legendary ? 'lendario' : 'comum',
-                        desc: sData.flavor_text_entries.find(l => l.language.name === 'en')?.flavor_text.replace(/[\n\f]/g, ' ')
+                        generation: sData.generation.name.toUpperCase(),
+                        desc: sData.flavor_text_entries.find(l => l.language.name === 'en')?.flavor_text.replace(/[\n\f]/g, ' '),
+                        habitat: sData.habitat?.name || 'desconhecido'
                     });
                 } catch (e) { console.error(e); }
             };
@@ -184,119 +219,153 @@
                 return pokemonList.filter(p => {
                     const matchesSearch = p.name.includes(search.toLowerCase()) || p.id.toString() === search;
                     const matchesType = typeFilter === 'todos' || (p.types && p.types.includes(typeFilter));
-                    const matchesRarity = rarityFilter === 'todos' || (p.rarity === rarityFilter);
-                    return matchesSearch && matchesType && matchesRarity;
+                    let matchesGen = true;
+                    if (genFilter !== 'todos') {
+                        const range = GENERATIONS[genFilter].range;
+                        matchesGen = p.id >= range[0] && p.id <= range[1];
+                    }
+                    return matchesSearch && matchesType && matchesGen;
                 });
-            }, [search, typeFilter, rarityFilter, pokemonList]);
+            }, [search, typeFilter, genFilter, pokemonList]);
 
             return (
-                <div className="min-h-screen px-4 md:px-8">
-                    <header className="sticky top-0 z-50 bg-slate-950/90 border-b border-slate-800 py-6 backdrop-blur-md">
+                <div className="min-h-screen px-4 md:px-8 pb-10">
+                    <header className="sticky top-0 z-50 bg-white/95 border-b border-slate-200 p-6 backdrop-blur-md">
                         <div className="max-w-[1800px] mx-auto flex flex-col xl:flex-row gap-6 items-center">
-                            <h1 className="text-3xl font-kanit font-bold text-yellow-400 shrink-0">POKEDEX PRO</h1>
+                            <div className="flex items-center gap-4">
+                                <div className="w-12 h-12 bg-red-600 rounded-full border-4 border-white shadow-xl flex items-center justify-center">
+                                    <div className="w-4 h-4 bg-white rounded-full animate-pulse shadow-md"></div>
+                                </div>
+                                <h1 className="text-3xl font-kanit font-bold text-slate-950 tracking-tighter">POKEDEX<span className="text-yellow-400">PRO</span></h1>
+                            </div>
+                            
                             <div className="flex flex-wrap w-full gap-3">
                                 <input 
                                     type="text" 
-                                    placeholder="Buscar por Nome ou ID..."
-                                    className="flex-1 min-w-[200px] bg-slate-900 border border-slate-700 rounded-2xl p-4 text-sm outline-none focus:border-yellow-400"
+                                    placeholder="Pesquisa instantanea (Nome ou ID)..."
+                                    className="flex-1 min-w-[250px] bg-white border border-slate-200 rounded-2xl p-4 text-sm outline-none focus:ring-2 ring-yellow-400 transition-all shadow-inner"
                                     onChange={e => setSearch(e.target.value)}
                                 />
-                                <select className="bg-slate-900 border border-slate-700 rounded-2xl p-4 text-sm outline-none font-bold" onChange={e => setTypeFilter(e.target.value)}>
-                                    <option value="todos">Todos Tipos</option>
+                                <select className="bg-white border border-slate-200 rounded-2xl p-4 text-sm font-bold text-slate-700 outline-none" onChange={e => setTypeFilter(e.target.value)}>
+                                    <option value="todos">Tipos</option>
                                     {Object.keys(TRANSLATIONS.types).map(k => <option key={k} value={k}>{TRANSLATIONS.types[k]}</option>)}
                                 </select>
-                                <select className="bg-slate-900 border border-slate-700 rounded-2xl p-4 text-sm outline-none font-bold text-yellow-400" onChange={e => setRarityFilter(e.target.value)}>
-                                    <option value="todos">Todas Raridades</option>
-                                    <option value="comum">Comum</option>
-                                    <option value="lendario">Lendario</option>
-                                    <option value="mitico">Mitico</option>
+                                <select className="bg-white border border-slate-200 rounded-2xl p-4 text-sm font-bold text-slate-700 outline-none" onChange={e => setGenFilter(e.target.value)}>
+                                    <option value="todos">Geracoes</option>
+                                    {Object.keys(GENERATIONS).map(k => <option key={k} value={k}>{GENERATIONS[k].name}</option>)}
                                 </select>
                             </div>
                         </div>
                     </header>
 
-                    <main className="max-w-[1800px] mx-auto mt-8">
-                        <div className="pokedex-grid">
-                            {filtered.map(p => (
-                                <div key={p.id} onClick={() => loadDetails(p.id)} className="pokemon-card rounded-[32px] p-5 flex flex-col items-center cursor-pointer">
-                                    <div className="w-full flex justify-between items-start mb-2">
-                                        <span className="text-slate-500 font-bold text-[10px]">#{p.id}</span>
-                                        {p.rarity && p.rarity !== 'comum' && (
-                                            <span className={`rarity-tag ${p.rarity === 'lendario' ? 'legendary' : 'mythical'}`}>{p.rarity}</span>
-                                        )}
+                    {loading ? (
+                        <div className="text-center mt-20 text-slate-500 font-kanit">Carregando Banco de Dados...</div>
+                    ) : (
+                        <main className="max-w-[1800px] mx-auto mt-10">
+                            <div className="pokedex-grid">
+                                {filtered.map(p => (
+                                    <div key={p.id} onClick={() => loadDetails(p.id)} className="pokemon-card rounded-3xl p-5 cursor-pointer relative flex flex-col items-center">
+                                        <div className="w-full flex justify-between items-start mb-2">
+                                            <span className="text-slate-400 font-bold text-[10px]">#{p.id}</span>
+                                            <div className="flex gap-1">
+                                                {p.isLegendary && <span className="tag-special gmax">LEG</span>}
+                                                {p.isMythical && <span className="tag-special mega">MYT</span>}
+                                            </div>
+                                        </div>
+                                        
+                                        <img src={p.img} className="w-32 h-32 md:w-40 md:h-40 object-contain my-3 drop-shadow-2xl z-10" loading="lazy" />
+                                        
+                                        <h2 className="font-kanit font-bold capitalize mt-4 text-sm md:text-base text-slate-950 tracking-wide text-center truncate w-full">{p.name}</h2>
+                                        
+                                        <div className="flex flex-wrap justify-center gap-1.5 mt-3 w-full">
+                                            {p.types ? p.types.map(t => (
+                                                <span key={t} className={`${COLORS[t]} text-[9px] px-2 py-1 rounded-lg font-bold uppercase shadow-sm`}>
+                                                    {TRANSLATIONS.types[t]}
+                                                </span>
+                                            )) : <span className="text-[10px] text-slate-300animate-pulse">Analizando...</span>}
+                                        </div>
                                     </div>
-                                    <img src={p.img} className="w-32 h-32 object-contain my-2 drop-shadow-xl" loading="lazy" />
-                                    <h2 className="text-sm font-kanit font-bold capitalize text-white mb-3">{p.name}</h2>
-                                    <div className="flex flex-wrap justify-center gap-1">
-                                        {p.types?.map(t => (
-                                            <span key={t} className={`${COLORS[t]} px-2 py-0.5 rounded-lg text-[8px] font-bold uppercase`}>
-                                                {TRANSLATIONS.types[t]}
-                                            </span>
-                                        ))}
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </main>
+                                ))}
+                            </div>
+                        </main>
+                    )}
 
                     {selected && (
                         <div className="fixed inset-0 modal-overlay flex items-end md:items-center justify-center z-[100] p-0 md:p-4" onClick={() => setSelected(null)}>
-                            <div className="bg-slate-950 w-full max-w-6xl max-h-[95vh] md:rounded-[48px] rounded-t-[40px] overflow-y-auto border-t md:border border-slate-800 shadow-2xl relative" onClick={e => e.stopPropagation()}>
-                                <div className="sticky top-0 bg-slate-950/95 p-6 border-b border-slate-800 flex justify-between items-center z-50">
-                                    <button onClick={() => setSelected(null)} className="text-yellow-400 font-bold text-xs">← VOLTAR</button>
+                            <div className="bg-white border border-slate-200 w-full max-w-5xl max-h-[92vh] md:rounded-[40px] rounded-t-[30px] overflow-y-auto" onClick={e => e.stopPropagation()}>
+                                
+                                <div className="sticky top-0 bg-white p-6 border-b border-slate-200 flex justify-between items-center z-50">
+                                    <button onClick={() => setSelected(null)} className="text-yellow-400 font-bold text-xs">← VOLTAR PARALISTA</button>
+                                    <h2 className="font-kanit font-bold capitalize text-2xl tracking-tighter text-slate-950">{selected.name}</h2>
                                     <div className="flex gap-2">
-                                        <span className={`rarity-tag ${selected.rarity === 'lendario' ? 'legendary' : selected.rarity === 'mitico' ? 'mythical' : 'bg-slate-800'}`}>
+                                        <span className={`tag-special ${selected.rarity === 'lendario' ? 'gmax' : selected.rarity === 'mitico' ? 'mega' : 'bg-slate-100'}`}>
                                             {selected.rarity}
                                         </span>
                                     </div>
                                 </div>
 
-                                <div className="p-6 md:p-12 flex flex-col lg:flex-row gap-12">
-                                    <div className="w-full lg:w-1/3 text-center">
-                                        <img src={selected.sprites.other['official-artwork'].front_default} className="w-64 h-64 mx-auto drop-shadow-2xl" />
-                                        <h2 className="text-5xl font-kanit font-bold capitalize mt-6">{selected.name}</h2>
-                                        <div className="flex justify-center gap-2 mt-4">
-                                            {selected.types.map(t => <span key={t.type.name} className={`${COLORS[t.type.name]} px-4 py-1 rounded-xl text-[10px] font-bold uppercase`}>{TRANSLATIONS.types[t.type.name]}</span>)}
+                                <div className="p-8 md:p-14 flex flex-col md:flex-row gap-12">
+                                    <div className="w-full md:w-1/3 text-center">
+                                        <div className="rounded-[40px] p-6 mb-4 bg-slate-50 border border-slate-100 relative group">
+                                            <img src={selected.sprites.other['official-artwork'].front_default} className="w-64 h-64 md:w-full mx-auto drop-shadow-[0_20px_50px_rgba(0,0,0,0.3)] group-hover:scale-105 transition-transform" />
+                                        </div>
+                                        <div className="flex flex-wrap justify-center gap-2 mb-6">
+                                            {selected.types.map(t => <span key={t.type.name} className={`${COLORS[t.type.name]} px-5 py-2 rounded-xl text-xs font-bold uppercase shadow-xl`}>{TRANSLATIONS.types[t.type.name]}</span>)}
+                                        </div>
+                                        <div className="flex justify-center gap-4 text-xs font-bold text-slate-500">
+                                            <span>ALTURA: {selected.height / 10}m</span>
+                                            <span>PESO: {selected.weight / 10}kg</span>
                                         </div>
                                     </div>
 
-                                    <div className="flex-1">
-                                        <p className="text-slate-400 text-sm italic mb-10 leading-relaxed">"{selected.desc}"</p>
+                                    <div className="flex-1 space-y-12">
+                                        <p className="text-slate-600 text-sm leading-relaxed italic border-l-4 border-slate-100 pl-4">"{selected.desc}"</p>
                                         
-                                        <h3 className="text-yellow-400 font-kanit font-bold text-[10px] tracking-widest mb-6 uppercase">Status Base</h3>
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6 mb-12">
-                                            {selected.stats.map(s => (
-                                                <div key={s.stat.name}>
-                                                    <div className="flex justify-between text-[10px] font-bold uppercase mb-2">
-                                                        <span className="text-slate-500">{TRANSLATIONS.stats[s.stat.name] || s.stat.name}</span>
-                                                        <span>{s.base_stat}</span>
+                                        <section>
+                                            <h3 className="text-yellow-400 font-kanit font-bold text-[10px] tracking-[0.3em] mb-6 uppercase">STATUS DE COMBATE</h3>
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-5">
+                                                {selected.stats.map(s => (
+                                                    <div key={s.stat.name}>
+                                                        <div className="flex justify-between text-[10px] font-bold uppercase mb-1.5">
+                                                            <span className="text-slate-500">{TRANSLATIONS.stats[s.stat.name] || s.stat.name}</span>
+                                                            <span className="text-slate-950">{s.base_stat}</span>
+                                                        </div>
+                                                        <div className="stat-bar">
+                                                            <div className={`stat-fill ${COLORS[selected.types[0].type.name]}`} style={{ width: `${(s.base_stat / 255) * 100}%` }}></div>
+                                                        </div>
                                                     </div>
-                                                    <div className="h-1.5 bg-slate-800 rounded-full overflow-hidden">
-                                                        <div className={`stat-fill ${COLORS[selected.types[0].type.name]}`} style={{ width: `${(s.base_stat / 255) * 100}%` }}></div>
-                                                    </div>
-                                                </div>
-                                            ))}
-                                        </div>
+                                                ))}
+                                            </div>
+                                        </section>
 
-                                        <h3 className="text-yellow-400 font-kanit font-bold text-[10px] tracking-widest mb-8 uppercase text-center md:text-left">Evolucoes e Variacoes</h3>
-                                        <div className="space-y-12">
-                                            {evoChain.map((step, i) => (
-                                                <div key={step.name} className="flex flex-col gap-4">
-                                                    <div className="flex items-center gap-4">
-                                                        <span className="text-[10px] font-bold text-slate-600 uppercase">Estagio {i + 1}</span>
-                                                        <div className="h-px bg-slate-800 flex-1"></div>
+                                        <section>
+                                            <h3 className="text-yellow-400 font-kanit font-bold text-[10px] tracking-[0.3em] mb-6 uppercase">EVOLUCOES & FORMAS</h3>
+                                            <div className="space-y-10 relative">
+                                                {evoChain.map((step, i) => (
+                                                    <div key={step.name} className="flex flex-col gap-6">
+                                                        <div className="flex items-center gap-4">
+                                                            <div className="bg-slate-100 text-slate-500 font-bold text-[10px] px-3 py-1.5 rounded-lg">ESTAGIO {i + 1}</div>
+                                                            <div className="h-px bg-slate-100 flex-1"></div>
+                                                        </div>
+                                                        
+                                                        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3">
+                                                            {step.varieties.map(v => (
+                                                                <div 
+                                                                    key={v.id} 
+                                                                    onClick={() => loadDetails(v.id)}
+                                                                    className={`cursor-pointer group flex flex-col items-center p-3 rounded-2xl border transition-all ${v.id === selected.id ? 'border-yellow-400 bg-yellow-400/5' : 'border-slate-100 hover:border-slate-200 bg-slate-50'}`}
+                                                                >
+                                                                    <img src={v.img} className="w-16 h-16 object-contain drop-shadow-xl" />
+                                                                    <p className="text-[9px] font-bold capitalize mt-3 text-slate-600 text-center max-w-[90px] truncate">{v.name.replace(/-/g, ' ')}</p>
+                                                                    {v.name.includes('-gmax') && <span className="tag-special gmax mt-1">GMAX</span>}
+                                                                    {v.name.includes('-mega') && <span className="tag-special mega mt-1">MEGA</span>}
+                                                                </div>
+                                                            ))}
+                                                        </div>
                                                     </div>
-                                                    <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-4">
-                                                        {step.varieties.map(v => (
-                                                            <div key={v.id} onClick={() => loadDetails(v.id)} className={`cursor-pointer group p-3 rounded-3xl border transition-all ${v.id === selected.id ? 'border-yellow-400 bg-yellow-400/10 shadow-lg shadow-yellow-400/10' : 'border-slate-800 hover:border-slate-600 bg-slate-900/50'}`}>
-                                                                <img src={v.img} className="w-16 h-16 mx-auto group-hover:scale-110 transition-transform" />
-                                                                <p className="text-[8px] font-bold capitalize mt-2 text-center text-slate-400 truncate">{v.name.replace(/-/g, ' ')}</p>
-                                                            </div>
-                                                        ))}
-                                                    </div>
-                                                </div>
-                                            ))}
-                                        </div>
+                                                ))}
+                                            </div>
+                                        </section>
                                     </div>
                                 </div>
                             </div>
