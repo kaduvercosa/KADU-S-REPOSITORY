@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pokedex Pro - Ultimate Edition</title>
+    <title>Pokedex Pro - Eduardo Edition</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -28,22 +28,22 @@
     </script>
 
     <style>
-        body { background-color: #0f172a; color: white; font-family: 'Montserrat', sans-serif; }
-        .pokemon-card { transition: all 0.3s ease; }
-        .pokemon-card:hover { transform: translateY(-5px); border-color: #facc15; box-shadow: 0 10px 20px rgba(0,0,0,0.6); }
-        .modal-overlay { backdrop-filter: blur(15px); background: rgba(0,0,0,0.9); z-index: 100; }
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+        body { background-color: #020617; color: white; font-family: 'Montserrat', sans-serif; }
+        .pokemon-card { transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .pokemon-card:hover { transform: translateY(-10px); border-color: #facc15; box-shadow: 0 25px 50px -12px rgba(250, 204, 21, 0.3); }
+        .modal-overlay { backdrop-filter: blur(25px); background: rgba(0,0,0,0.8); z-index: 100; }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: #facc15; }
         .stat-bar { height: 6px; background: #1e293b; border-radius: 3px; overflow: hidden; }
-        .stat-fill { height: 100%; transition: width 0.8s ease-out; }
+        .stat-fill { height: 100%; transition: width 1s ease-in-out; }
     </style>
 </head>
 <body>
     <div id="root"></div>
 
     <script type="text/babel">
-        const { useState, useEffect, useRef, useCallback } = React;
+        const { useState, useEffect, useMemo } = React;
 
         const TRANSLATIONS = {
             types: {
@@ -68,129 +68,128 @@
         };
 
         function App() {
-            const [pokemonList, setPokemonList] = useState([]);
-            const [loading, setLoading] = useState(false);
-            const [offset, setOffset] = useState(0);
+            const [allPokemon, setAllPokemon] = useState([]);
+            const [loading, setLoading] = useState(true);
             const [search, setSearch] = useState('');
             const [typeFilter, setTypeFilter] = useState('todos');
             const [rarityFilter, setRarityFilter] = useState('todos');
-            const [selectedPokemon, setSelectedPokemon] = useState(null);
+            const [selected, setSelected] = useState(null);
             const [evoChain, setEvoChain] = useState([]);
-            
-            const observer = useRef();
-            const lastElementRef = useCallback(node => {
-                if (loading) return;
-                if (observer.current) observer.current.disconnect();
-                observer.current = new IntersectionObserver(entries => {
-                    if (entries[0].isIntersecting) {
-                        setOffset(prev => prev + 20);
-                    }
-                });
-                if (node) observer.current.observe(node);
-            }, [loading]);
 
-            // Carrega lista com dados de especie (raridade)
+            // Puxa TODOS os pokemons de uma vez (IDs e Nomes)
             useEffect(() => {
-                const fetchList = async () => {
-                    setLoading(true);
+                const fetchAll = async () => {
                     try {
-                        const res = await fetch(`https://pokeapi.co/api/v2/pokemon?limit=20&offset=${offset}`);
+                        const res = await fetch('https://pokeapi.co/api/v2/pokemon?limit=1025');
                         const data = await res.json();
-                        
-                        const details = await Promise.all(data.results.map(async (p) => {
-                            const pRes = await fetch(p.url);
-                            const pData = await pRes.json();
-                            const sRes = await fetch(pData.species.url);
-                            const sData = await sRes.json();
-                            return {
-                                ...pData,
-                                isLegendary: sData.is_legendary,
-                                isMythical: sData.is_mythical
-                            };
+                        const basicList = data.results.map((p, index) => ({
+                            name: p.name,
+                            id: index + 1,
+                            url: p.url,
+                            img: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${index + 1}.png`
                         }));
+                        setAllPokemon(basicList);
+                        setLoading(false);
                         
-                        setPokemonList(prev => [...prev, ...details]);
+                        // Carrega detalhes (tipos e raridade) em background para os filtros funcionarem
+                        loadFullData(basicList);
                     } catch (e) { console.error(e); }
-                    setLoading(false);
                 };
-                fetchList();
-            }, [offset]);
+                fetchAll();
+            }, []);
 
-            const loadDetails = async (idOrName) => {
-                setLoading(true);
-                try {
-                    const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${idOrName}`);
-                    const data = await res.json();
-                    const sRes = await fetch(data.species.url);
-                    const sData = await sRes.json();
-                    
-                    setSelectedPokemon({
-                        ...data,
-                        isLegendary: sData.is_legendary,
-                        isMythical: sData.is_mythical
+            const loadFullData = async (list) => {
+                // Carrega em lotes para nao travar o navegador
+                for (let i = 0; i < list.length; i += 50) {
+                    const batch = list.slice(i, i + 50);
+                    const details = await Promise.all(batch.map(async (p) => {
+                        const res = await fetch(p.url);
+                        const d = await res.json();
+                        const sRes = await fetch(d.species.url);
+                        const s = await sRes.json();
+                        return { 
+                            ...p, 
+                            types: d.types.map(t => t.type.name),
+                            isLegendary: s.is_legendary,
+                            isMythical: s.is_mythical
+                        };
+                    }));
+                    setAllPokemon(prev => {
+                        const newList = [...prev];
+                        details.forEach(d => { newList[d.id - 1] = d; });
+                        return newList;
                     });
-
-                    // Evolucoes
-                    const eRes = await fetch(sData.evolution_chain.url);
-                    const eData = await eRes.json();
-                    let chain = [];
-                    let curr = eData.chain;
-                    while(curr) {
-                        const pRes = await fetch(`https://pokeapi.co/api/v2/pokemon/${curr.species.name}`);
-                        const pData = await pRes.json();
-                        chain.push({
-                            name: curr.species.name,
-                            id: pData.id,
-                            img: pData.sprites.other['official-artwork'].front_default
-                        });
-                        curr = curr.evolves_to[0];
-                    }
-                    setEvoChain(chain);
-                } catch (e) { console.error(e); }
-                setLoading(false);
+                }
             };
 
-            const filtered = pokemonList.filter(p => {
-                const matchesSearch = p.name.toLowerCase().includes(search.toLowerCase()) || p.id.toString() === search;
-                const matchesType = typeFilter === 'todos' || p.types.some(t => t.type.name === typeFilter);
+            const loadDetails = async (id) => {
+                const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`);
+                const data = await res.json();
+                const sRes = await fetch(data.species.url);
+                const sData = await sRes.json();
                 
-                let matchesRarity = true;
-                if (rarityFilter === 'lendario') matchesRarity = p.isLegendary;
-                else if (rarityFilter === 'mitico') matchesRarity = p.isMythical;
-                else if (rarityFilter === 'comum') matchesRarity = !p.isLegendary && !p.isMythical;
+                // Evolucoes
+                const eRes = await fetch(sData.evolution_chain.url);
+                const eData = await eRes.json();
+                let chain = [];
+                let curr = eData.chain;
+                while(curr) {
+                    const pId = curr.species.url.split('/').filter(Boolean).pop();
+                    chain.push({
+                        name: curr.species.name,
+                        id: pId,
+                        img: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${pId}.png`
+                    });
+                    curr = curr.evolves_to[0];
+                }
 
-                return matchesSearch && matchesType && matchesRarity;
-            });
-
-            const closeDetails = () => {
-                setSelectedPokemon(null);
-                setEvoChain([]);
+                setEvoChain(chain);
+                setSelected({
+                    ...data,
+                    description: sData.flavor_text_entries.find(e => e.language.name === 'en')?.flavor_text.replace(/[\n\f]/g, ' '),
+                    isLegendary: sData.is_legendary,
+                    isMythical: sData.is_mythical,
+                    habitat: sData.habitat?.name || 'desconhecido',
+                    generation: sData.generation.name.toUpperCase()
+                });
             };
+
+            const filtered = useMemo(() => {
+                return allPokemon.filter(p => {
+                    const matchesSearch = p.name.includes(search.toLowerCase()) || p.id.toString() === search;
+                    const matchesType = typeFilter === 'todos' || (p.types && p.types.includes(typeFilter));
+                    let matchesRarity = true;
+                    if (rarityFilter === 'lendario') matchesRarity = p.isLegendary;
+                    else if (rarityFilter === 'mitico') matchesRarity = p.isMythical;
+                    else if (rarityFilter === 'comum') matchesRarity = !p.isLegendary && !p.isMythical;
+                    return matchesSearch && matchesType && matchesRarity;
+                });
+            }, [search, typeFilter, rarityFilter, allPokemon]);
 
             return (
                 <div className="min-h-screen">
-                    <header className="sticky top-0 z-50 bg-slate-900/95 border-b border-slate-800 p-4 shadow-2xl">
-                        <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-center gap-4">
-                            <h1 className="text-3xl font-kanit font-bold text-yellow-400">Pokédex Pro</h1>
+                    {/* Header com Filtros */}
+                    <header className="sticky top-0 z-50 bg-slate-900/90 border-b border-yellow-400/20 p-6 backdrop-blur-xl">
+                        <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-center gap-6">
+                            <div className="flex items-center gap-4">
+                                <div className="w-12 h-12 bg-red-600 rounded-full border-4 border-white shadow-lg flex items-center justify-center">
+                                    <div className="w-4 h-4 bg-white rounded-full animate-ping"></div>
+                                </div>
+                                <h1 className="text-3xl font-kanit font-bold text-white tracking-tighter">POKEDEX<span className="text-yellow-400">PRO</span></h1>
+                            </div>
                             
-                            <div className="flex flex-wrap w-full gap-2">
+                            <div className="flex flex-wrap w-full gap-3">
                                 <input 
                                     type="text" 
-                                    placeholder="Nome ou Numero..."
-                                    className="flex-1 min-w-[200px] bg-slate-800 border border-slate-700 rounded-xl p-3 outline-none focus:border-yellow-400 text-white"
+                                    placeholder="Pesquisa instantanea (Nome ou ID)..."
+                                    className="flex-1 min-w-[200px] bg-slate-800 border border-slate-700 rounded-2xl p-4 outline-none focus:ring-2 ring-yellow-400 text-white"
                                     onChange={e => setSearch(e.target.value)}
                                 />
-                                <select 
-                                    className="bg-slate-800 border border-slate-700 rounded-xl p-3 outline-none focus:border-yellow-400 text-white"
-                                    onChange={e => setTypeFilter(e.target.value)}
-                                >
+                                <select className="bg-slate-800 border border-slate-700 rounded-2xl p-4 text-white outline-none" onChange={e => setTypeFilter(e.target.value)}>
                                     <option value="todos">Todos os Tipos</option>
                                     {Object.keys(TRANSLATIONS.types).map(k => <option key={k} value={k}>{TRANSLATIONS.types[k]}</option>)}
                                 </select>
-                                <select 
-                                    className="bg-slate-800 border border-slate-700 rounded-xl p-3 outline-none focus:border-yellow-400 text-white"
-                                    onChange={e => setRarityFilter(e.target.value)}
-                                >
+                                <select className="bg-slate-800 border border-slate-700 rounded-2xl p-4 text-white outline-none" onChange={e => setRarityFilter(e.target.value)}>
                                     <option value="todos">Todas Raridades</option>
                                     <option value="comum">Comum</option>
                                     <option value="lendario">Lendario</option>
@@ -200,81 +199,126 @@
                         </div>
                     </header>
 
-                    <main className="max-w-7xl mx-auto p-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-                        {filtered.map((p, idx) => (
+                    {/* Grid de Cards Completos */}
+                    <main className="max-w-7xl mx-auto p-6 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
+                        {filtered.map(p => (
                             <div 
-                                key={`${p.id}-${idx}`}
-                                ref={idx === filtered.length - 1 ? lastElementRef : null}
+                                key={p.id} 
                                 onClick={() => loadDetails(p.id)}
-                                className="pokemon-card bg-slate-800 border border-slate-700 rounded-2xl p-4 cursor-pointer relative"
+                                className={`pokemon-card bg-slate-800 border-2 border-slate-700 rounded-[30px] p-5 cursor-pointer relative flex flex-col items-center overflow-hidden`}
                             >
-                                {p.isLegendary && <span className="absolute top-2 right-2 text-[8px] bg-yellow-500 text-black px-2 py-0.5 rounded-full font-bold">LENDARIO</span>}
-                                {p.isMythical && <span className="absolute top-2 right-2 text-[8px] bg-purple-500 text-white px-2 py-0.5 rounded-full font-bold">MITICO</span>}
+                                <span className="absolute top-4 left-5 text-slate-500 font-bold text-xs italic">#{p.id}</span>
+                                {p.isLegendary && <span className="absolute top-4 right-4 w-2 h-2 bg-yellow-400 rounded-full shadow-[0_0_10px_#facc15]"></span>}
                                 
-                                <span className="absolute top-2 left-3 text-slate-500 font-bold text-xs">#{p.id}</span>
-                                <img src={p.sprites.other['official-artwork'].front_default} className="w-full h-auto drop-shadow-lg mt-2" />
-                                <h2 className="text-center font-kanit font-bold capitalize mt-2 text-sm">{p.name}</h2>
+                                <img src={p.img} className="w-32 h-32 md:w-40 md:h-40 drop-shadow-2xl z-10" />
+                                
+                                <h2 className="font-kanit font-bold capitalize mt-4 text-lg text-white">{p.name}</h2>
+                                
+                                <div className="flex flex-wrap justify-center gap-1 mt-3">
+                                    {p.types ? p.types.map(t => (
+                                        <span key={t} className={`${COLORS[t]} text-[9px] px-2 py-1 rounded-lg font-bold uppercase`}>
+                                            {TRANSLATIONS.types[t]}
+                                        </span>
+                                    )) : <span className="text-[10px] text-slate-600 animate-pulse">Carregando...</span>}
+                                </div>
                             </div>
                         ))}
                     </main>
 
-                    {loading && <div className="text-center p-10 text-yellow-400 font-bold animate-pulse">Carregando...</div>}
-
-                    {/* Modal com Navegacao e Raridade */}
-                    {selectedPokemon && (
-                        <div className="fixed inset-0 modal-overlay flex items-center justify-center p-4" onClick={closeDetails}>
-                            <div className="bg-slate-900 border border-slate-700 w-full max-w-4xl max-h-[90vh] rounded-3xl overflow-y-auto" onClick={e => e.stopPropagation()}>
+                    {/* Modal com Navegacao por Evolucao */}
+                    {selected && (
+                        <div className="fixed inset-0 modal-overlay flex items-center justify-center p-4" onClick={() => setSelected(null)}>
+                            <div className="bg-slate-900 border border-slate-700 w-full max-w-5xl max-h-[90vh] rounded-[40px] overflow-y-auto" onClick={e => e.stopPropagation()}>
                                 
-                                {/* Botao Voltar Fixo no Topo do Modal */}
-                                <div className="sticky top-0 bg-slate-900/80 p-4 border-b border-slate-800 flex justify-between items-center backdrop-blur-md">
-                                    <button onClick={closeDetails} className="bg-slate-800 hover:bg-slate-700 px-4 py-2 rounded-xl text-yellow-400 font-bold flex items-center gap-2 transition-all">
-                                        <span>←</span> Voltar para a Lista
+                                <div className="sticky top-0 bg-slate-900/90 p-6 border-b border-slate-800 flex justify-between items-center z-30">
+                                    <button onClick={() => setSelected(null)} className="text-yellow-400 font-bold flex items-center gap-2 hover:bg-slate-800 p-2 rounded-xl transition-all">
+                                        ← VOLTAR PARA LISTA
                                     </button>
                                     <div className="flex gap-2">
-                                        {selectedPokemon.isLegendary && <span className="bg-yellow-500 text-black text-[10px] px-3 py-1 rounded-full font-bold uppercase">Lendario</span>}
-                                        {selectedPokemon.isMythical && <span className="bg-purple-500 text-white text-[10px] px-3 py-1 rounded-full font-bold uppercase">Mitico</span>}
-                                        {!selectedPokemon.isLegendary && !selectedPokemon.isMythical && <span className="bg-slate-700 text-white text-[10px] px-3 py-1 rounded-full font-bold uppercase">Comum</span>}
+                                        <span className="bg-slate-800 px-3 py-1 rounded-lg text-xs font-bold text-slate-400 uppercase">{selected.generation}</span>
+                                        <span className={`px-3 py-1 rounded-lg text-xs font-bold uppercase ${selected.isLegendary ? 'bg-yellow-500 text-black' : selected.isMythical ? 'bg-purple-600 text-white' : 'bg-slate-700 text-white'}`}>
+                                            {selected.isLegendary ? 'Lendario' : selected.isMythical ? 'Mitico' : 'Comum'}
+                                        </span>
                                     </div>
                                 </div>
 
-                                <div className="p-6 md:p-10 flex flex-col md:flex-row gap-10">
-                                    <div className="w-full md:w-1/3 text-center">
-                                        <div className={`rounded-3xl p-6 mb-4 ${COLORS[selectedPokemon.types[0].type.name]} bg-opacity-20`}>
-                                            <img src={selectedPokemon.sprites.other['official-artwork'].front_default} className="w-full drop-shadow-2xl" />
+                                <div className="p-8 md:p-12 flex flex-col lg:flex-row gap-12">
+                                    <div className="w-full lg:w-1/3 text-center">
+                                        <div className={`rounded-full p-10 mb-6 bg-gradient-to-b from-slate-800 to-transparent shadow-inner`}>
+                                            <img src={selected.sprites.other['official-artwork'].front_default} className="w-full drop-shadow-[0_20px_50px_rgba(0,0,0,0.5)]" />
                                         </div>
-                                        <h2 className="text-4xl font-kanit font-bold capitalize mb-4">{selectedPokemon.name}</h2>
+                                        <h2 className="text-5xl font-kanit font-bold capitalize mb-2">{selected.name}</h2>
+                                        <p className="text-slate-400 text-sm leading-relaxed italic mb-6">"{selected.description}"</p>
+                                        
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div className="bg-slate-800 p-4 rounded-3xl border border-slate-700">
+                                                <p className="text-[10px] text-slate-500 font-bold">ALTURA</p>
+                                                <p className="text-xl font-bold text-yellow-400">{selected.height / 10}m</p>
+                                            </div>
+                                            <div className="bg-slate-800 p-4 rounded-3xl border border-slate-700">
+                                                <p className="text-[10px] text-slate-500 font-bold">PESO</p>
+                                                <p className="text-xl font-bold text-yellow-400">{selected.weight / 10}kg</p>
+                                            </div>
+                                        </div>
                                     </div>
 
-                                    <div className="flex-1">
-                                        <h3 className="text-yellow-400 font-kanit font-bold mb-4 uppercase text-sm tracking-widest">Estatisticas</h3>
-                                        <div className="grid gap-3 mb-8">
-                                            {selectedPokemon.stats.map(s => (
-                                                <div key={s.stat.name}>
-                                                    <div className="flex justify-between text-[10px] font-bold uppercase mb-1">
-                                                        <span>{TRANSLATIONS.stats[s.stat.name] || s.stat.name}</span>
-                                                        <span className="text-yellow-400">{s.base_stat}</span>
+                                    <div className="flex-1 space-y-10">
+                                        <div>
+                                            <h3 className="text-yellow-400 font-kanit font-bold mb-6 uppercase text-xs tracking-widest flex items-center gap-4">
+                                                ESTATISTICAS BASE <span className="h-px bg-slate-800 flex-1"></span>
+                                            </h3>
+                                            <div className="space-y-4">
+                                                {selected.stats.map(s => (
+                                                    <div key={s.stat.name}>
+                                                        <div className="flex justify-between text-[10px] font-bold uppercase mb-1">
+                                                            <span>{TRANSLATIONS.stats[s.stat.name] || s.stat.name}</span>
+                                                            <span className="text-yellow-400">{s.base_stat}</span>
+                                                        </div>
+                                                        <div className="stat-bar">
+                                                            <div className={`stat-fill ${COLORS[selected.types[0].type.name]}`} style={{ width: `${(s.base_stat / 255) * 100}%` }}></div>
+                                                        </div>
                                                     </div>
-                                                    <div className="stat-bar">
-                                                        <div className={`stat-fill ${COLORS[selectedPokemon.types[0].type.name]}`} style={{ width: `${(s.base_stat / 255) * 100}%` }}></div>
-                                                    </div>
-                                                </div>
-                                            ))}
+                                                ))}
+                                            </div>
                                         </div>
 
-                                        <h3 className="text-yellow-400 font-kanit font-bold mb-6 uppercase text-sm tracking-widest">Linha Evolutiva</h3>
-                                        <div className="flex flex-wrap items-center justify-center gap-4">
-                                            {evoChain.map((evo, idx) => (
-                                                <React.Fragment key={evo.id}>
-                                                    <div 
-                                                        onClick={() => loadDetails(evo.id)}
-                                                        className={`cursor-pointer p-3 rounded-2xl border transition-all ${evo.id === selectedPokemon.id ? 'border-yellow-400 bg-yellow-400/10' : 'border-slate-800 bg-slate-800'}`}
-                                                    >
-                                                        <img src={evo.img} className="w-16 h-16" />
-                                                        <p className="text-[10px] font-bold text-center capitalize mt-1">{evo.name}</p>
-                                                    </div>
-                                                    {idx < evoChain.length - 1 && <span className="text-slate-700 font-bold">➔</span>}
-                                                </React.Fragment>
-                                            ))}
+                                        <div>
+                                            <h3 className="text-yellow-400 font-kanit font-bold mb-6 uppercase text-xs tracking-widest flex items-center gap-4">
+                                                LINHA EVOLUTIVA <span className="h-px bg-slate-800 flex-1"></span>
+                                            </h3>
+                                            <div className="flex flex-wrap items-center justify-center gap-6 bg-slate-800/30 p-6 rounded-[30px]">
+                                                {evoChain.map((evo, idx) => (
+                                                    <React.Fragment key={evo.id}>
+                                                        <div 
+                                                            onClick={() => loadDetails(evo.id)}
+                                                            className={`cursor-pointer group flex flex-col items-center p-4 rounded-2xl transition-all ${evo.id == selected.id ? 'bg-yellow-400/10 border border-yellow-400/50' : 'hover:bg-slate-800'}`}
+                                                        >
+                                                            <img src={evo.img} className="w-20 h-20 group-hover:scale-110 transition-transform" />
+                                                            <p className="text-[10px] font-bold capitalize mt-2 text-slate-400">{evo.name}</p>
+                                                        </div>
+                                                        {idx < evoChain.length - 1 && <span className="text-slate-700 text-2xl font-bold">➔</span>}
+                                                    </React.Fragment>
+                                                ))}
+                                            </div>
+                                        </div>
+
+                                        <div className="grid grid-cols-2 gap-8">
+                                            <div>
+                                                <h3 className="text-yellow-400 font-kanit font-bold mb-4 uppercase text-xs tracking-widest">HABILIDADES</h3>
+                                                <div className="flex flex-wrap gap-2">
+                                                    {selected.abilities.map(a => (
+                                                        <span key={a.ability.name} className="bg-slate-800 px-4 py-2 rounded-xl text-[10px] font-bold capitalize border border-slate-700">
+                                                            {a.ability.name.replace('-', ' ')}
+                                                        </span>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <h3 className="text-yellow-400 font-kanit font-bold mb-4 uppercase text-xs tracking-widest">HABITAT</h3>
+                                                <span className="bg-slate-800 px-4 py-2 rounded-xl text-[10px] font-bold capitalize border border-slate-700 block text-center">
+                                                    {selected.habitat}
+                                                </span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
