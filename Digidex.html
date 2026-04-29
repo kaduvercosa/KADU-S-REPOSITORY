@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digidex Elite - Eduardo Pro</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;700&family=Montserrat:wght@300;500;700&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        kanit: ['Kanit', 'sans-serif'],
+                        montserrat: ['Montserrat', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        * { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+        body { font-family: 'Montserrat', sans-serif; -webkit-tap-highlight-color: transparent; }
+        
+        .digi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 12px;
+        }
+        @media (min-width: 1024px) {
+            .digi-grid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 24px; }
+        }
+
+        .digimon-card { position: relative; z-index: 1; overflow: hidden; border-bottom-width: 4px; }
+        .digimon-card:hover { transform: translateY(-8px) scale(1.02); }
+        
+        .modal-overlay { backdrop-filter: blur(20px); z-index: 100; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .hide-scroll::-webkit-scrollbar { display: none; }
+        
+        .level-tag { font-size: 8px; font-weight: 800; padding: 2px 6px; border-radius: 4px; text-transform: uppercase; }
+        
+        /* Cores de Atributos */
+        .vaccine { background: #3b82f6; color: white; }
+        .virus { background: #ef4444; color: white; }
+        .data { background: #10b981; color: white; }
+        .free { background: #6b7280; color: white; }
+
+        .skeleton { background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%); background-size: 200% 100%; animation: skeletonLoad 1.5s infinite; }
+        @keyframes skeletonLoad { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-900">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useMemo } = React;
+
+        const TRANSLATIONS = {
+            levels: {
+                'Fresh': 'Bebe',
+                'In-Training': 'Em Treinamento',
+                'Rookie': 'Novato',
+                'Champion': 'Campeao',
+                'Ultimate': 'Perfeito',
+                'Mega': 'Mega',
+                'Armor': 'Armadura',
+                'Hybrid': 'Hibrido'
+            },
+            attributes: {
+                'Vaccine': 'Vacina',
+                'Virus': 'Virus',
+                'Data': 'Dados',
+                'Free': 'Livre',
+                'Unknown': 'Desconhecido'
+            }
+        };
+
+        const ATTR_COLORS = {
+            'Vaccine': 'border-blue-500',
+            'Virus': 'border-red-500',
+            'Data': 'border-emerald-500',
+            'Free': 'border-slate-500',
+            'Unknown': 'border-slate-300'
+        };
+
+        function App() {
+            const [theme, setTheme] = useState('light');
+            const [digimonList, setDigimonList] = useState([]);
+            const [loading, setLoading] = useState(true);
+            const [search, setSearch] = useState('');
+            const [levelF, setLevelF] = useState('todos');
+            const [selected, setSelected] = useState(null);
+            const [evoData, setEvoData] = useState({ prior: [], next: [] });
+
+            useEffect(() => { document.documentElement.className = theme; }, [theme]);
+
+            useEffect(() => {
+                const fetchDigimons = async () => {
+                    try {
+                        // Carregando os primeiros 1000 Digimons para busca instantanea
+                        const res = await fetch('https://digimon-api.com/api/v1/digimon?pageSize=1000');
+                        const data = await res.json();
+                        setDigimonList(data.content);
+                        setLoading(false);
+                    } catch (e) { console.error(e); }
+                };
+                fetchDigimons();
+            }, []);
+
+            const loadDetails = async (id) => {
+                const res = await fetch(`https://digimon-api.com/api/v1/digimon/${id}`);
+                const data = await res.json();
+                
+                // Organizando as evolucoes (Digimon API separa em Prior e Next)
+                setEvoData({
+                    prior: data.priorEvolutions || [],
+                    next: data.nextEvolutions || []
+                });
+
+                setSelected({
+                    ...data,
+                    level: data.levels[0]?.level || 'Desconhecido',
+                    attribute: data.attributes[0]?.attribute || 'Unknown',
+                    desc: data.descriptions.find(d => d.language === 'en')?.description || 'Sem descricao disponivel.'
+                });
+            };
+
+            const filtered = useMemo(() => {
+                return digimonList.filter(d => {
+                    const mSearch = d.name.toLowerCase().includes(search.toLowerCase()) || d.id.toString() === search;
+                    // Filtro de nivel simplificado na lista principal
+                    return mSearch;
+                });
+            }, [search, digimonList]);
+
+            return (
+                <div className={`min-h-screen pb-10 ${theme === 'dark' ? 'bg-[#020617] text-white' : 'bg-slate-50 text-slate-900'}`}>
+                    
+                    <header className={`sticky top-0 z-[60] border-b backdrop-blur-xl ${theme === 'dark' ? 'bg-[#020617]/80 border-slate-800' : 'bg-white/80 border-slate-200'}`}>
+                        <div className="max-w-[1800px] mx-auto p-4 md:p-6">
+                            <div className="flex justify-between items-center mb-5">
+                                <div className="flex items-center gap-2">
+                                    <div className="w-8 h-8 bg-orange-500 rounded-lg shadow-lg flex items-center justify-center">
+                                        <div className="w-2 h-2 bg-white rounded-full animate-ping"></div>
+                                    </div>
+                                    <h1 className="text-xl md:text-2xl font-kanit font-bold tracking-tight uppercase">Digidex<span className="text-orange-500 font-black">Elite</span></h1>
+                                </div>
+                                <button 
+                                    onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                                    className={`px-4 py-2 rounded-2xl border text-[10px] font-bold tracking-widest ${theme === 'dark' ? 'bg-slate-900 border-slate-700 text-white' : 'bg-white border-slate-200 text-slate-700 shadow-sm'}`}
+                                >
+                                    {theme === 'dark' ? 'MODO CLARO' : 'MODO ESCURO'}
+                                </button>
+                            </div>
+                            
+                            <div className="flex flex-wrap gap-2 md:gap-3">
+                                <input 
+                                    type="text" 
+                                    placeholder="Nome ou ID do Digimon..."
+                                    className={`flex-1 min-w-[200px] p-3.5 rounded-2xl text-sm outline-none border focus:ring-2 ring-orange-500 transition-all ${theme === 'dark' ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100 shadow-sm'}`}
+                                    onChange={e => setSearch(e.target.value)}
+                                />
+                            </div>
+                        </div>
+                    </header>
+
+                    <main className="max-w-[1800px] mx-auto p-4 md:p-8">
+                        <div className="digi-grid">
+                            {loading ? (
+                                Array(15).fill(0).map((_, i) => (
+                                    <div key={i} className="h-48 rounded-[35px] skeleton"></div>
+                                ))
+                            ) : filtered.map(d => (
+                                <div 
+                                    key={d.id} 
+                                    onClick={() => loadDetails(d.id)} 
+                                    className={`digimon-card rounded-[35px] p-5 cursor-pointer border flex flex-col items-center group ${theme === 'dark' ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100 shadow-md shadow-slate-200/40'}`}
+                                >
+                                    <div className="w-full flex justify-between items-start">
+                                        <span className="text-[11px] font-bold text-slate-400">#{d.id}</span>
+                                    </div>
+                                    <img src={d.image} className="w-28 h-28 md:w-36 md:h-36 object-contain drop-shadow-2xl z-10 group-hover:scale-110 transition-transform" />
+                                    <h2 className={`text-sm md:text-base font-kanit font-bold capitalize mt-3 text-center ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>{d.name}</h2>
+                                </div>
+                            ))}
+                        </div>
+                    </main>
+
+                    {selected && (
+                        <div className="fixed inset-0 modal-overlay flex items-end md:items-center justify-center p-0 md:p-6" onClick={() => setSelected(null)}>
+                            <div className={`w-full max-w-6xl h-[92vh] md:h-auto max-h-[92vh] md:rounded-[48px] rounded-t-[40px] border shadow-2xl relative flex flex-col overflow-hidden ${theme === 'dark' ? 'bg-slate-950 border-slate-800 text-white' : 'bg-white border-slate-200 text-slate-900'}`} onClick={e => e.stopPropagation()}>
+                                
+                                {/* CABECALHO FIXO */}
+                                <div className={`flex-none p-5 border-b flex justify-between items-center z-[120] ${theme === 'dark' ? 'bg-slate-950 border-slate-800' : 'bg-white border-slate-200'}`}>
+                                    <button 
+                                        onClick={() => setSelected(null)} 
+                                        className="bg-orange-600 text-white px-6 py-2.5 rounded-2xl text-[10px] font-bold uppercase tracking-widest shadow-xl active:scale-95 transition-transform"
+                                    >
+                                        ← VOLTAR
+                                    </button>
+                                    <span className={`tag-rare ${selected.attribute.toLowerCase().includes('vaccine') ? 'vaccine' : selected.attribute.toLowerCase().includes('virus') ? 'virus' : 'data'}`}>
+                                        {TRANSLATIONS.attributes[selected.attribute] || selected.attribute}
+                                    </span>
+                                </div>
+
+                                {/* CONTEUDO */}
+                                <div className="flex-1 overflow-y-auto p-6 md:p-12 hide-scroll">
+                                    <div className="flex flex-col md:flex-row gap-12">
+                                        <div className="w-full md:w-1/3 text-center">
+                                            <div className={`rounded-[40px] p-8 mb-8 border relative group overflow-hidden ${theme === 'dark' ? 'bg-slate-900 border-slate-800' : 'bg-slate-50 border-slate-100'}`}>
+                                                <img src={selected.images[0].href} className="w-52 h-52 md:w-full mx-auto relative z-10 drop-shadow-2xl" />
+                                            </div>
+                                            <h2 className="text-4xl font-kanit font-bold capitalize mb-4 tracking-tighter">{selected.name}</h2>
+                                            <div className="flex justify-center gap-2 mb-8">
+                                                <span className="bg-orange-500 px-5 py-2 rounded-xl text-xs font-bold uppercase text-white shadow-xl">
+                                                    {TRANSLATIONS.levels[selected.level] || selected.level}
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        <div className="flex-1 space-y-12">
+                                            <p className={`text-base italic leading-relaxed border-l-4 pl-4 ${theme === 'dark' ? 'text-slate-400 border-slate-700' : 'text-slate-600 border-slate-200'}`}>
+                                                "{selected.desc}"
+                                            </p>
+                                            
+                                            {/* EVOLUCOES ANTERIORES */}
+                                            {evoData.prior.length > 0 && (
+                                                <section>
+                                                    <h3 className="text-orange-600 font-kanit font-bold text-[11px] tracking-[0.3em] mb-6 uppercase">Evolui de:</h3>
+                                                    <div className="flex flex-wrap gap-4 justify-center md:justify-start">
+                                                        {evoData.prior.map(evo => (
+                                                            <div key={evo.id} onClick={() => loadDetails(evo.id)} className={`cursor-pointer group p-3 rounded-[35px] border transition-all ${theme === 'dark' ? 'border-slate-800 bg-slate-900/50 hover:border-slate-600' : 'border-slate-100 bg-white hover:border-slate-200 shadow-sm'}`}>
+                                                                <img src={evo.image} className="w-16 h-16 mx-auto group-hover:scale-110 transition-transform" />
+                                                                <p className="text-[10px] font-bold capitalize mt-2 text-center text-slate-500 truncate max-w-[85px]">{evo.digimon}</p>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </section>
+                                            )}
+
+                                            {/* PROXIMAS EVOLUCOES */}
+                                            {evoData.next.length > 0 && (
+                                                <section>
+                                                    <h3 className="text-orange-600 font-kanit font-bold text-[11px] tracking-[0.3em] mb-6 uppercase">Pode evoluir para:</h3>
+                                                    <div className="flex flex-wrap gap-4 justify-center md:justify-start">
+                                                        {evoData.next.map(evo => (
+                                                            <div key={evo.id} onClick={() => loadDetails(evo.id)} className={`cursor-pointer group p-3 rounded-[35px] border transition-all ${theme === 'dark' ? 'border-slate-800 bg-slate-900/50 hover:border-slate-600' : 'border-slate-100 bg-white hover:border-slate-200 shadow-sm'}`}>
+                                                                <img src={evo.image} className="w-16 h-16 mx-auto group-hover:scale-110 transition-transform" />
+                                                                <p className="text-[10px] font-bold capitalize mt-2 text-center text-slate-500 truncate max-w-[85px]">{evo.digimon}</p>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </section>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
