@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pokedex Pro - Eduardo Advanced Edition</title>
+    <title>Pokedex Pro - Ultimate Theme Edition</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -16,23 +16,12 @@
 
     <script>
         tailwind.config = {
+            darkMode: 'class',
             theme: {
                 extend: {
-                    colors: {
-                        slate: {
-                            50: '#f8fafc',
-                            100: '#f1f5f9',
-                            800: '#1e293b',
-                            900: '#0f172a',
-                            950: '#020617',
-                        }
-                    },
                     fontFamily: {
                         kanit: ['Kanit', 'sans-serif'],
                         montserrat: ['Montserrat', 'sans-serif'],
-                    },
-                    screens: {
-                        '3xl': '2000px',
                     }
                 }
             }
@@ -40,49 +29,38 @@
     </script>
 
     <style>
-        /* TEMA CLARO DEFINIDO */
-        body { background-color: #f8fafc; color: #0f172a; font-family: 'Montserrat', sans-serif; -webkit-tap-highlight-color: transparent; }
+        /* Transicao suave de cores */
+        * { transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease; }
         
-        /* Grid responsivo e otimizado */
+        body { font-family: 'Montserrat', sans-serif; -webkit-tap-highlight-color: transparent; }
+        
+        /* Grid inteligente para PC e Mobile */
         .pokedex-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-            gap: 16px;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 12px;
             width: 100%;
         }
         @media (min-width: 1024px) {
             .pokedex-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 24px; }
         }
 
-        /* Card Visual Light Theme */
-        .pokemon-card { 
-            background: #ffffff;
-            border: 1px solid #e2e8f0;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
-        }
-        .pokemon-card:hover {
-            transform: translateY(-8px);
-            border-color: #facc15;
-            box-shadow: 0 15px 30px -10px rgba(0, 0, 0, 0.1);
-        }
-
-        .modal-overlay { backdrop-filter: blur(25px); background: rgba(15, 23, 42, 0.85); z-index: 100; }
+        .modal-overlay { backdrop-filter: blur(12px); z-index: 100; }
         .hide-scroll::-webkit-scrollbar { display: none; }
-        .stat-bar { height: 8px; background: #e2e8f0; border-radius: 4px; overflow: hidden; }
+        .stat-bar { height: 8px; border-radius: 4px; overflow: hidden; }
         .stat-fill { height: 100%; transition: width 1s ease-out; }
         
-        .tag-special { font-size: 9px; font-weight: 800; padding: 3px 8px; border-radius: 6px; text-transform: uppercase; }
-        .gmax { background: linear-gradient(45deg, #ff0000, #ff7b00); color: #fff; }
-        .mega { background: linear-gradient(45deg, #00c6ff, #0072ff); color: #fff; }
+        /* Cores de Raridade */
+        .tag-rare { font-size: 8px; font-weight: 800; padding: 2px 6px; border-radius: 4px; text-transform: uppercase; }
+        .legendary { background: #facc15; color: #000; box-shadow: 0 0 10px rgba(250, 204, 21, 0.4); }
+        .mythical { background: #a855f7; color: #fff; box-shadow: 0 0 10px rgba(168, 85, 247, 0.4); }
     </style>
 </head>
 <body>
     <div id="root"></div>
 
     <script type="text/babel">
-        const { useState, useEffect, useMemo, useRef, useCallback } = React;
+        const { useState, useEffect, useMemo } = React;
 
         const TRANSLATIONS = {
             types: {
@@ -92,7 +70,7 @@
                 ice: 'Gelo', dragon: 'Dragao', steel: 'Aco', flying: 'Voador', dark: 'Sombrio'
             },
             stats: {
-                hp: 'Vida', attack: 'Ataque', defense: 'Defesa', 
+                hp: 'Vida', attack: 'Atk', defense: 'Def', 
                 'special-attack': 'Atk Esp', 'special-defense': 'Def Esp', speed: 'Veloc'
             }
         };
@@ -106,50 +84,51 @@
         };
 
         const GENERATIONS = {
-            'gen1': { name: 'Gen 1 (Kanto)', range: [1, 151] },
-            'gen2': { name: 'Gen 2 (Johto)', range: [152, 251] },
-            'gen3': { name: 'Gen 3 (Hoenn)', range: [252, 386] },
-            'gen4': { name: 'Gen 4 (Sinnoh)', range: [387, 493] },
-            'gen5': { name: 'Gen 5 (Unova)', range: [494, 649] },
-            'gen6': { name: 'Gen 6 (Kalos)', range: [650, 721] },
-            'gen7': { name: 'Gen 7 (Alola)', range: [722, 809] },
-            'gen8': { name: 'Gen 8 (Galar)', range: [810, 905] },
-            'gen9': { name: 'Gen 9 (Paldea)', range: [906, 1025] }
+            'gen1': { name: 'Gen 1', range: [1, 151] },
+            'gen2': { name: 'Gen 2', range: [152, 251] },
+            'gen3': { name: 'Gen 3', range: [252, 386] },
+            'gen4': { name: 'Gen 4', range: [387, 493] },
+            'gen5': { name: 'Gen 5', range: [494, 649] },
+            'gen6': { name: 'Gen 6', range: [650, 721] },
+            'gen7': { name: 'Gen 7', range: [722, 809] },
+            'gen8': { name: 'Gen 8', range: [810, 905] },
+            'gen9': { name: 'Gen 9', range: [906, 1025] }
         };
 
         function App() {
+            const [theme, setTheme] = useState('dark');
             const [pokemonList, setPokemonList] = useState([]);
             const [loading, setLoading] = useState(true);
             const [search, setSearch] = useState('');
-            const [typeFilter, setTypeFilter] = useState('todos');
-            const [genFilter, setGenFilter] = useState('todos');
+            const [typeF, setTypeF] = useState('todos');
+            const [genF, setGenF] = useState('todos');
+            const [rareF, setRareF] = useState('todos');
             const [selected, setSelected] = useState(null);
             const [evoChain, setEvoChain] = useState([]);
 
             useEffect(() => {
-                const fetchBase = async () => {
-                    setLoading(true);
-                    try {
-                        // Carrega os nomes e IDs basicos imediatamente
-                        const res = await fetch('https://pokeapi.co/api/v2/pokemon?limit=1025');
-                        const data = await res.json();
-                        const list = data.results.map((p, i) => ({
-                            name: p.name,
-                            id: i + 1,
-                            img: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${i + 1}.png`
-                        }));
-                        setPokemonList(list);
-                        setLoading(false);
-                        // Carrega tipos e raridade em background
-                        loadMetadataInBackground(list);
-                    } catch (e) { console.error(e); setLoading(false); }
+                document.documentElement.className = theme;
+            }, [theme]);
+
+            useEffect(() => {
+                const fetchInit = async () => {
+                    const res = await fetch('https://pokeapi.co/api/v2/pokemon?limit=1025');
+                    const data = await res.json();
+                    const list = data.results.map((p, i) => ({
+                        name: p.name,
+                        id: i + 1,
+                        img: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${i + 1}.png`
+                    }));
+                    setPokemonList(list);
+                    setLoading(false);
+                    loadFullData(list);
                 };
-                fetchBase();
+                fetchInit();
             }, []);
 
-            const loadMetadataInBackground = async (list) => {
-                for (let i = 0; i < list.length; i += 60) {
-                    const batch = list.slice(i, i + 60);
+            const loadFullData = async (list) => {
+                for (let i = 0; i < list.length; i += 50) {
+                    const batch = list.slice(i, i + 50);
                     const details = await Promise.all(batch.map(async p => {
                         try {
                             const r = await fetch(`https://pokeapi.co/api/v2/pokemon/${p.id}`);
@@ -159,8 +138,7 @@
                             return { 
                                 ...p, 
                                 types: d.types.map(t => t.type.name),
-                                isLegendary: sd.is_legendary,
-                                isMythical: sd.is_mythical
+                                rarity: sd.is_mythical ? 'mitico' : sd.is_legendary ? 'lendario' : 'comum'
                             };
                         } catch { return p; }
                     }));
@@ -176,196 +154,163 @@
             };
 
             const loadDetails = async (idOrName) => {
-                try {
-                    const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${idOrName}`);
-                    const data = await res.json();
-                    const sRes = await fetch(data.species.url);
-                    const sData = await sRes.json();
-                    const eRes = await fetch(sData.evolution_chain.url);
-                    const eData = await eRes.json();
+                const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${idOrName}`);
+                const data = await res.json();
+                const sRes = await fetch(data.species.url);
+                const sData = await sRes.json();
+                const eRes = await fetch(sData.evolution_chain.url);
+                const eData = await eRes.json();
 
-                    let chain = [];
-                    let curr = eData.chain;
-                    while (curr) {
-                        const name = curr.species.name;
-                        const spRes = await fetch(`https://pokeapi.co/api/v2/pokemon-species/${name}`);
-                        const spData = await spRes.json();
-                        
-                        const varieties = await Promise.all(spData.varieties.map(async v => {
-                            const vR = await fetch(v.pokemon.url);
-                            const vD = await vR.json();
-                            return {
-                                name: v.pokemon.name,
-                                id: vD.id,
-                                isDefault: v.is_default,
-                                img: vD.sprites.other['official-artwork'].front_default || vD.sprites.front_default
-                            };
-                        }));
-
-                        chain.push({ name, varieties });
-                        curr = curr.evolves_to[0];
-                    }
-                    setEvoChain(chain);
-                    setSelected({
-                        ...data,
-                        generation: sData.generation.name.toUpperCase(),
-                        desc: sData.flavor_text_entries.find(l => l.language.name === 'en')?.flavor_text.replace(/[\n\f]/g, ' '),
-                        habitat: sData.habitat?.name || 'desconhecido'
-                    });
-                } catch (e) { console.error(e); }
+                let chain = [];
+                let curr = eData.chain;
+                while (curr) {
+                    const name = curr.species.name;
+                    const spRes = await fetch(`https://pokeapi.co/api/v2/pokemon-species/${name}`);
+                    const spData = await spRes.json();
+                    const varieties = await Promise.all(spData.varieties.map(async v => {
+                        const vR = await fetch(v.pokemon.url);
+                        const vD = await vR.json();
+                        return { name: v.pokemon.name, id: vD.id, img: vD.sprites.other['official-artwork'].front_default || vD.sprites.front_default };
+                    }));
+                    chain.push({ name, varieties });
+                    curr = curr.evolves_to[0];
+                }
+                setEvoChain(chain);
+                setSelected({
+                    ...data,
+                    rarity: sData.is_mythical ? 'mitico' : sData.is_legendary ? 'lendario' : 'comum',
+                    desc: sData.flavor_text_entries.find(l => l.language.name === 'en')?.flavor_text.replace(/[\n\f]/g, ' ')
+                });
             };
 
             const filtered = useMemo(() => {
                 return pokemonList.filter(p => {
-                    const matchesSearch = p.name.includes(search.toLowerCase()) || p.id.toString() === search;
-                    const matchesType = typeFilter === 'todos' || (p.types && p.types.includes(typeFilter));
-                    let matchesGen = true;
-                    if (genFilter !== 'todos') {
-                        const range = GENERATIONS[genFilter].range;
-                        matchesGen = p.id >= range[0] && p.id <= range[1];
+                    const mSearch = p.name.includes(search.toLowerCase()) || p.id.toString() === search;
+                    const mType = typeF === 'todos' || (p.types && p.types.includes(typeF));
+                    const mRare = rareF === 'todos' || (p.rarity === rareF);
+                    let mGen = true;
+                    if (genF !== 'todos') {
+                        const r = GENERATIONS[genF].range;
+                        mGen = p.id >= r[0] && p.id <= r[1];
                     }
-                    return matchesSearch && matchesType && matchesGen;
+                    return mSearch && mType && mRare && mGen;
                 });
-            }, [search, typeFilter, genFilter, pokemonList]);
+            }, [search, typeF, genF, rareF, pokemonList]);
 
             return (
-                <div className="min-h-screen px-4 md:px-8 pb-10">
-                    <header className="sticky top-0 z-50 bg-white/95 border-b border-slate-200 p-6 backdrop-blur-md">
-                        <div className="max-w-[1800px] mx-auto flex flex-col xl:flex-row gap-6 items-center">
-                            <div className="flex items-center gap-4">
-                                <div className="w-12 h-12 bg-red-600 rounded-full border-4 border-white shadow-xl flex items-center justify-center">
-                                    <div className="w-4 h-4 bg-white rounded-full animate-pulse shadow-md"></div>
-                                </div>
-                                <h1 className="text-3xl font-kanit font-bold text-slate-950 tracking-tighter">POKEDEX<span className="text-yellow-400">PRO</span></h1>
+                <div className={`min-h-screen ${theme === 'dark' ? 'bg-slate-950 text-white' : 'bg-slate-100 text-slate-900'}`}>
+                    {/* Header com Toggle e Filtros */}
+                    <header className={`sticky top-0 z-50 border-b p-4 md:p-6 backdrop-blur-md ${theme === 'dark' ? 'bg-slate-950/90 border-slate-800' : 'bg-white/90 border-slate-200'}`}>
+                        <div className="max-w-[1600px] mx-auto">
+                            <div className="flex justify-between items-center mb-6">
+                                <h1 className="text-2xl font-kanit font-bold tracking-tighter">POKEDEX<span className="text-yellow-400">PRO</span></h1>
+                                <button 
+                                    onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                                    className={`px-4 py-2 rounded-xl font-bold text-xs uppercase tracking-widest ${theme === 'dark' ? 'bg-white text-black' : 'bg-slate-900 text-white'}`}
+                                >
+                                    {theme === 'dark' ? '☀️ Modo Claro' : '🌙 Modo Escuro'}
+                                </button>
                             </div>
                             
-                            <div className="flex flex-wrap w-full gap-3">
+                            <div className="flex flex-wrap gap-3">
                                 <input 
                                     type="text" 
-                                    placeholder="Pesquisa instantanea (Nome ou ID)..."
-                                    className="flex-1 min-w-[250px] bg-white border border-slate-200 rounded-2xl p-4 text-sm outline-none focus:ring-2 ring-yellow-400 transition-all shadow-inner"
+                                    placeholder="Nome ou ID..."
+                                    className={`flex-1 min-w-[200px] p-3 rounded-xl text-sm outline-none border focus:ring-2 ring-yellow-400 ${theme === 'dark' ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-300'}`}
                                     onChange={e => setSearch(e.target.value)}
                                 />
-                                <select className="bg-white border border-slate-200 rounded-2xl p-4 text-sm font-bold text-slate-700 outline-none" onChange={e => setTypeFilter(e.target.value)}>
-                                    <option value="todos">Tipos</option>
+                                <select className={`p-3 rounded-xl text-sm font-bold border outline-none ${theme === 'dark' ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-300'}`} onChange={e => setTypeF(e.target.value)}>
+                                    <option value="todos">Todos Tipos</option>
                                     {Object.keys(TRANSLATIONS.types).map(k => <option key={k} value={k}>{TRANSLATIONS.types[k]}</option>)}
                                 </select>
-                                <select className="bg-white border border-slate-200 rounded-2xl p-4 text-sm font-bold text-slate-700 outline-none" onChange={e => setGenFilter(e.target.value)}>
+                                <select className={`p-3 rounded-xl text-sm font-bold border outline-none ${theme === 'dark' ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-300'}`} onChange={e => setGenF(e.target.value)}>
                                     <option value="todos">Geracoes</option>
                                     {Object.keys(GENERATIONS).map(k => <option key={k} value={k}>{GENERATIONS[k].name}</option>)}
+                                </select>
+                                <select className={`p-3 rounded-xl text-sm font-bold border outline-none text-yellow-500 ${theme === 'dark' ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-300'}`} onChange={e => setRareF(e.target.value)}>
+                                    <option value="todos">Raridades</option>
+                                    <option value="comum">Comum</option>
+                                    <option value="lendario">Lendario</option>
+                                    <option value="mitico">Mitico</option>
                                 </select>
                             </div>
                         </div>
                     </header>
 
-                    {loading ? (
-                        <div className="text-center mt-20 text-slate-500 font-kanit">Carregando Banco de Dados...</div>
-                    ) : (
-                        <main className="max-w-[1800px] mx-auto mt-10">
-                            <div className="pokedex-grid">
-                                {filtered.map(p => (
-                                    <div key={p.id} onClick={() => loadDetails(p.id)} className="pokemon-card rounded-3xl p-5 cursor-pointer relative flex flex-col items-center">
-                                        <div className="w-full flex justify-between items-start mb-2">
-                                            <span className="text-slate-400 font-bold text-[10px]">#{p.id}</span>
-                                            <div className="flex gap-1">
-                                                {p.isLegendary && <span className="tag-special gmax">LEG</span>}
-                                                {p.isMythical && <span className="tag-special mega">MYT</span>}
-                                            </div>
-                                        </div>
-                                        
-                                        <img src={p.img} className="w-32 h-32 md:w-40 md:h-40 object-contain my-3 drop-shadow-2xl z-10" loading="lazy" />
-                                        
-                                        <h2 className="font-kanit font-bold capitalize mt-4 text-sm md:text-base text-slate-950 tracking-wide text-center truncate w-full">{p.name}</h2>
-                                        
-                                        <div className="flex flex-wrap justify-center gap-1.5 mt-3 w-full">
-                                            {p.types ? p.types.map(t => (
-                                                <span key={t} className={`${COLORS[t]} text-[9px] px-2 py-1 rounded-lg font-bold uppercase shadow-sm`}>
-                                                    {TRANSLATIONS.types[t]}
-                                                </span>
-                                            )) : <span className="text-[10px] text-slate-300animate-pulse">Analizando...</span>}
-                                        </div>
+                    <main className="max-w-[1600px] mx-auto p-4 md:p-8">
+                        <div className="pokedex-grid">
+                            {filtered.map(p => (
+                                <div key={p.id} onClick={() => loadDetails(p.id)} className={`rounded-3xl p-5 cursor-pointer border flex flex-col items-center hover:-translate-y-2 transition-all ${theme === 'dark' ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200 shadow-sm'}`}>
+                                    <div className="w-full flex justify-between items-start mb-2">
+                                        <span className="text-[10px] font-bold text-slate-500">#{p.id}</span>
+                                        {p.rarity && p.rarity !== 'comum' && <span className={`tag-rare ${p.rarity === 'lendario' ? 'legendary' : 'mythical'}`}>{p.rarity}</span>}
                                     </div>
-                                ))}
-                            </div>
-                        </main>
-                    )}
-
-                    {selected && (
-                        <div className="fixed inset-0 modal-overlay flex items-end md:items-center justify-center z-[100] p-0 md:p-4" onClick={() => setSelected(null)}>
-                            <div className="bg-white border border-slate-200 w-full max-w-5xl max-h-[92vh] md:rounded-[40px] rounded-t-[30px] overflow-y-auto" onClick={e => e.stopPropagation()}>
-                                
-                                <div className="sticky top-0 bg-white p-6 border-b border-slate-200 flex justify-between items-center z-50">
-                                    <button onClick={() => setSelected(null)} className="text-yellow-400 font-bold text-xs">← VOLTAR PARALISTA</button>
-                                    <h2 className="font-kanit font-bold capitalize text-2xl tracking-tighter text-slate-950">{selected.name}</h2>
-                                    <div className="flex gap-2">
-                                        <span className={`tag-special ${selected.rarity === 'lendario' ? 'gmax' : selected.rarity === 'mitico' ? 'mega' : 'bg-slate-100'}`}>
-                                            {selected.rarity}
-                                        </span>
+                                    <img src={p.img} className="w-24 h-24 md:w-32 md:h-32 object-contain my-2 drop-shadow-xl" loading="lazy" />
+                                    <h2 className={`text-sm font-kanit font-bold capitalize mt-2 ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>{p.name}</h2>
+                                    <div className="flex flex-wrap justify-center gap-1 mt-3">
+                                        {p.types?.map(t => <span key={t} className={`${COLORS[t]} px-2 py-0.5 rounded-md text-[8px] font-bold uppercase text-white`}>{TRANSLATIONS.types[t]}</span>)}
                                     </div>
                                 </div>
+                            ))}
+                        </div>
+                    </main>
 
-                                <div className="p-8 md:p-14 flex flex-col md:flex-row gap-12">
+                    {selected && (
+                        <div className="fixed inset-0 modal-overlay flex items-end md:items-center justify-center p-0 md:p-4" onClick={() => setSelected(null)}>
+                            <div className={`w-full max-w-5xl max-h-[92vh] md:rounded-[40px] rounded-t-[30px] overflow-y-auto border shadow-2xl relative ${theme === 'dark' ? 'bg-slate-950 border-slate-800' : 'bg-white border-slate-200'}`} onClick={e => e.stopPropagation()}>
+                                <div className={`sticky top-0 p-4 border-b flex justify-between items-center z-50 backdrop-blur-md ${theme === 'dark' ? 'bg-slate-950/90 border-slate-800' : 'bg-white/90 border-slate-200'}`}>
+                                    <button onClick={() => setSelected(null)} className="text-yellow-500 font-bold text-xs uppercase tracking-widest">← Voltar</button>
+                                    <span className={`tag-rare ${selected.rarity === 'lendario' ? 'legendary' : selected.rarity === 'mitico' ? 'mythical' : 'bg-slate-200 text-slate-700'}`}>{selected.rarity}</span>
+                                </div>
+
+                                <div className="p-6 md:p-12 flex flex-col md:flex-row gap-10">
                                     <div className="w-full md:w-1/3 text-center">
-                                        <div className="rounded-[40px] p-6 mb-4 bg-slate-50 border border-slate-100 relative group">
-                                            <img src={selected.sprites.other['official-artwork'].front_default} className="w-64 h-64 md:w-full mx-auto drop-shadow-[0_20px_50px_rgba(0,0,0,0.3)] group-hover:scale-105 transition-transform" />
+                                        <div className={`rounded-[40px] p-6 mb-6 border ${theme === 'dark' ? 'bg-slate-900 border-slate-800' : 'bg-slate-50 border-slate-100'}`}>
+                                            <img src={selected.sprites.other['official-artwork'].front_default} className="w-48 h-48 md:w-full mx-auto drop-shadow-2xl" />
                                         </div>
-                                        <div className="flex flex-wrap justify-center gap-2 mb-6">
-                                            {selected.types.map(t => <span key={t.type.name} className={`${COLORS[t.type.name]} px-5 py-2 rounded-xl text-xs font-bold uppercase shadow-xl`}>{TRANSLATIONS.types[t.type.name]}</span>)}
-                                        </div>
-                                        <div className="flex justify-center gap-4 text-xs font-bold text-slate-500">
-                                            <span>ALTURA: {selected.height / 10}m</span>
-                                            <span>PESO: {selected.weight / 10}kg</span>
+                                        <h2 className="text-4xl font-kanit font-bold capitalize mb-4">{selected.name}</h2>
+                                        <div className="flex justify-center gap-2">
+                                            {selected.types.map(t => <span key={t.type.name} className={`${COLORS[t.type.name]} px-4 py-1 rounded-xl text-[10px] font-bold uppercase text-white shadow-md`}>{TRANSLATIONS.types[t.type.name]}</span>)}
                                         </div>
                                     </div>
 
-                                    <div className="flex-1 space-y-12">
-                                        <p className="text-slate-600 text-sm leading-relaxed italic border-l-4 border-slate-100 pl-4">"{selected.desc}"</p>
+                                    <div className="flex-1">
+                                        <p className={`text-sm italic mb-8 border-l-4 pl-4 ${theme === 'dark' ? 'text-slate-400 border-slate-700' : 'text-slate-600 border-slate-200'}`}>"{selected.desc}"</p>
                                         
-                                        <section>
-                                            <h3 className="text-yellow-400 font-kanit font-bold text-[10px] tracking-[0.3em] mb-6 uppercase">STATUS DE COMBATE</h3>
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-5">
-                                                {selected.stats.map(s => (
-                                                    <div key={s.stat.name}>
-                                                        <div className="flex justify-between text-[10px] font-bold uppercase mb-1.5">
-                                                            <span className="text-slate-500">{TRANSLATIONS.stats[s.stat.name] || s.stat.name}</span>
-                                                            <span className="text-slate-950">{s.base_stat}</span>
-                                                        </div>
-                                                        <div className="stat-bar">
-                                                            <div className={`stat-fill ${COLORS[selected.types[0].type.name]}`} style={{ width: `${(s.base_stat / 255) * 100}%` }}></div>
-                                                        </div>
+                                        <h3 className="text-yellow-500 font-kanit font-bold text-[10px] tracking-widest mb-6 uppercase">Estatisticas</h3>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 mb-10">
+                                            {selected.stats.map(s => (
+                                                <div key={s.stat.name}>
+                                                    <div className="flex justify-between text-[10px] font-bold uppercase mb-1">
+                                                        <span className="text-slate-500">{TRANSLATIONS.stats[s.stat.name] || s.stat.name}</span>
+                                                        <span>{s.base_stat}</span>
                                                     </div>
-                                                ))}
-                                            </div>
-                                        </section>
+                                                    <div className={`h-1.5 rounded-full overflow-hidden ${theme === 'dark' ? 'bg-slate-800' : 'bg-slate-200'}`}>
+                                                        <div className={`stat-fill ${COLORS[selected.types[0].type.name]}`} style={{ width: `${(s.base_stat / 255) * 100}%` }}></div>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
 
-                                        <section>
-                                            <h3 className="text-yellow-400 font-kanit font-bold text-[10px] tracking-[0.3em] mb-6 uppercase">EVOLUCOES & FORMAS</h3>
-                                            <div className="space-y-10 relative">
-                                                {evoChain.map((step, i) => (
-                                                    <div key={step.name} className="flex flex-col gap-6">
-                                                        <div className="flex items-center gap-4">
-                                                            <div className="bg-slate-100 text-slate-500 font-bold text-[10px] px-3 py-1.5 rounded-lg">ESTAGIO {i + 1}</div>
-                                                            <div className="h-px bg-slate-100 flex-1"></div>
-                                                        </div>
-                                                        
-                                                        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3">
-                                                            {step.varieties.map(v => (
-                                                                <div 
-                                                                    key={v.id} 
-                                                                    onClick={() => loadDetails(v.id)}
-                                                                    className={`cursor-pointer group flex flex-col items-center p-3 rounded-2xl border transition-all ${v.id === selected.id ? 'border-yellow-400 bg-yellow-400/5' : 'border-slate-100 hover:border-slate-200 bg-slate-50'}`}
-                                                                >
-                                                                    <img src={v.img} className="w-16 h-16 object-contain drop-shadow-xl" />
-                                                                    <p className="text-[9px] font-bold capitalize mt-3 text-slate-600 text-center max-w-[90px] truncate">{v.name.replace(/-/g, ' ')}</p>
-                                                                    {v.name.includes('-gmax') && <span className="tag-special gmax mt-1">GMAX</span>}
-                                                                    {v.name.includes('-mega') && <span className="tag-special mega mt-1">MEGA</span>}
-                                                                </div>
-                                                            ))}
-                                                        </div>
+                                        <h3 className="text-yellow-500 font-kanit font-bold text-[10px] tracking-widest mb-6 uppercase">Evolucoes e Variacoes</h3>
+                                        <div className="space-y-8">
+                                            {evoChain.map((step, i) => (
+                                                <div key={step.name} className="flex flex-col gap-4">
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="text-[9px] font-bold text-slate-500 uppercase">Estagio {i + 1}</span>
+                                                        <div className={`h-px flex-1 ${theme === 'dark' ? 'bg-slate-800' : 'bg-slate-100'}`}></div>
                                                     </div>
-                                                ))}
-                                            </div>
-                                        </section>
+                                                    <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
+                                                        {step.varieties.map(v => (
+                                                            <div key={v.id} onClick={() => loadDetails(v.id)} className={`cursor-pointer group p-2 rounded-2xl border transition-all ${v.id === selected.id ? 'border-yellow-400 bg-yellow-400/5 shadow-lg shadow-yellow-400/10' : theme === 'dark' ? 'border-slate-800 bg-slate-900/50 hover:border-slate-600' : 'border-slate-100 bg-slate-50 hover:border-slate-200'}`}>
+                                                                <img src={v.img} className="w-12 h-12 mx-auto group-hover:scale-110 transition-transform" />
+                                                                <p className="text-[8px] font-bold capitalize mt-2 text-center text-slate-500 truncate">{v.name.replace(/-/g, ' ')}</p>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
