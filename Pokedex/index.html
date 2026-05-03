@@ -511,7 +511,7 @@
         });
         
         let speciesUrl = data.species.url; let speciesData = null;
-        try { const specRes = await fetch(speciesUrl); speciesData = await specRes.json(); } catch(e){}
+        try { const specRes = await fetch(speciesUrl); speciesData = await specRes.json(); } catch(e){ console.error("Error fetching species data:", e); }
         
         if (speciesData) {
            let flavorEntry = speciesData.flavor_text_entries.find(f => f.language.name === 'pt-BR' || f.language.name === 'pt');
@@ -525,7 +525,7 @@
                const transRes = await fetch(transUrl); const transData = await transRes.json();
                let translated = ''; transData[0].forEach(part => { translated += part[0]; });
                synopsis = translated;
-             } catch(e) {}
+             } catch(e) { console.error("Error translating synopsis:", e); }
            }
            document.getElementById('poke-desc').innerText = '\"' + synopsis + '\"';
            
@@ -553,7 +553,7 @@
                fetch('https://pokeapi.co/api/v2/pokemon/' + varId).then(r => r.json()).then(pData => {
                    const pType = pData.types[0].type.name; const bgColor = typeColors[pType] || '#777';
                    card.style.setProperty('--card-bg', bgColor); card.classList.add('colored-card');
-               }).catch(e=>{});
+               }).catch(e=>{ console.error("Error fetching alternative form data:", e); });
              });
            } else { varDiv.style.display = 'none'; }
         }
@@ -588,10 +588,10 @@
             fetch('https://pokeapi.co/api/v2/pokemon/' + evo.id).then(r => r.json()).then(pData => {
                  const pType = pData.types[0].type.name; const bgColor = typeColors[pType] || '#777';
                  card.style.setProperty('--card-bg', bgColor); card.classList.add('colored-card');
-            }).catch(e=>{});
+            }).catch(e=>{ console.error("Error fetching evolution data:", e); });
           });
         } else { evoDiv.style.display = 'none'; }
-      } catch (e) {}
+      } catch (e) { console.error("Error fetching evolutions:", e); }
     }
     
     function searchPokemon() { 
