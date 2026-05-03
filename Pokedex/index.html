@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>POKÉDEX ULTRA V8</title>
+  <title>POKÉDEX ULTRA</title>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800;900&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -160,18 +160,16 @@
     .mini-type { padding: 3px 8px; border-radius: 10px; font-size: 9px; font-family: 'Montserrat', sans-serif; font-weight: 800; text-transform: uppercase; color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.5); box-shadow: 0 2px 5px rgba(0,0,0,0.3); letter-spacing: 0.5px; border: 1px solid rgba(255,255,255,0.3); }
     
     .extra-info-container { width: 100%; display: flex; flex-direction: column; gap: 15px; margin-top: 20px; z-index: 10; }
-    .extra-section { background: rgba(0,0,0,0.15); border: 1px solid rgba(255,255,255,0.15); border-radius: 20px; padding: 15px; display: flex; flex-direction: column; align-items: center; box-shadow: inset 0 2px 10px rgba(0,0,0,0.05); }
-    @media (prefers-color-scheme: dark) { .extra-section { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); } }
-    .extra-title { font-size: 11px; color: var(--type-color); text-transform: uppercase; font-family: 'Montserrat', sans-serif; font-weight: 900; margin-bottom: 10px; letter-spacing: 1px; text-shadow: 0 1px 2px rgba(0,0,0,0.2); text-align: center; }
+    .extra-section { background: var(--glass-panel); border: 1px solid var(--glass-border); border-radius: 20px; padding: 15px; display: flex; flex-direction: column; align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+    .extra-title { font-size: 11px; color: var(--type-color); text-transform: uppercase; font-family: 'Montserrat', sans-serif; font-weight: 900; margin-bottom: 10px; letter-spacing: 1px; text-shadow: 0 1px 2px rgba(0,0,0,0.2); text-align: center; transition: color 0.6s ease; }
     
     #poke-shiny { width: 100px; height: 100px; object-fit: contain; filter: drop-shadow(0 5px 10px rgba(0,0,0,0.3)); transition: transform 0.3s ease; }
     #poke-shiny:hover { transform: scale(1.1); }
     
     .capture-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; }
-    .cap-box { display: flex; flex-direction: column; align-items: center; background: rgba(255,255,255,0.1); padding: 8px; border-radius: 12px; }
-    @media (prefers-color-scheme: dark) { .cap-box { background: rgba(255,255,255,0.05); } }
-    .cap-label { font-size: 9px; text-transform: uppercase; font-weight: 800; opacity: 0.8; margin-bottom: 3px; }
-    .cap-value { font-size: 14px; font-weight: 900; }
+    .cap-box { display: flex; flex-direction: column; align-items: center; background: transparent; padding: 8px; border-radius: 12px; }
+    .cap-label { font-size: 10px; color: var(--type-color); text-transform: uppercase; font-weight: 900; margin-bottom: 2px; letter-spacing: 1px; transition: color 0.6s ease; }
+    .cap-value { font-size: 14px; font-weight: 800; }
     
     .dmg-types { display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; width: 100%; }
     
@@ -202,11 +200,11 @@
     }
     
     @media (min-width: 768px) {
-      #main-card { flex-direction: row; align-items: flex-start; gap: 40px; padding: 50px 40px; max-width: 1000px; margin-top: 20px; }
-      .img-container { width: 45%; flex-shrink: 0; position: sticky; top: 120px; }
+      #main-card { display: grid; grid-template-columns: 45% 1fr; grid-template-rows: auto auto; column-gap: 40px; row-gap: 30px; padding: 50px 40px; max-width: 1000px; margin-top: 20px; }
+      .img-container { width: 100%; grid-column: 1; grid-row: 1; position: relative; top: auto; }
+      .extra-info-container { width: 100%; grid-column: 1; grid-row: 2; margin-top: 0; align-self: start; position: sticky; top: 120px; }
       #poke-image { margin-top: -40px; width: 100%; max-width: 380px; height: auto; }
-      .extra-info-container { margin-top: 30px; }
-      .card-content { flex: 1; align-items: flex-start; text-align: left; }
+      .card-content { width: 100%; grid-column: 2; grid-row: 1 / span 2; align-items: flex-start; text-align: left; }
       #poke-types, .moves-container { justify-content: flex-start; }
       .section-title { text-align: left; }
       .info-grid { grid-template-columns: repeat(3, 1fr); }
@@ -257,31 +255,6 @@
         <div class="glass-bg liquid-glass"></div>
         <div class="img-container">
            <img id="poke-image" src="" alt="" onclick="randomPokemon()">
-           
-           <div id="extra-info" class="extra-info-container">
-             <div class="extra-section">
-               <span class="extra-title">Versão Brilhante</span>
-               <img id="poke-shiny" src="" alt="Shiny">
-             </div>
-             
-             <div class="extra-section">
-               <span class="extra-title">Dados de Captura</span>
-               <div class="capture-grid">
-                 <div class="cap-box"><span class="cap-label">Taxa Base</span><span class="cap-value" id="poke-capture">-</span></div>
-                 <div class="cap-box"><span class="cap-label">Felicidade</span><span class="cap-value" id="poke-happiness">-</span></div>
-               </div>
-             </div>
-             
-             <div class="extra-section">
-               <span class="extra-title">Fraquezas (x2 ou x4)</span>
-               <div id="poke-weaknesses" class="dmg-types"></div>
-             </div>
-             
-             <div class="extra-section">
-               <span class="extra-title">Resistências (x0.5, x0.25 ou Imune)</span>
-               <div id="poke-resistances" class="dmg-types"></div>
-             </div>
-           </div>
         </div>
         <div class="card-content">
           <div id="poke-name">Carregando...</div>
@@ -304,6 +277,27 @@
           <div class="moves-wrapper">
             <h3 class="section-title">Movimentos (Moves)</h3>
             <div id="poke-moves" class="moves-container"></div>
+          </div>
+        </div>
+        <div id="extra-info" class="extra-info-container">
+          <div class="extra-section">
+            <span class="extra-title">Versão Brilhante</span>
+            <img id="poke-shiny" src="" alt="Shiny">
+          </div>
+          <div class="extra-section">
+            <span class="extra-title">Dados de Captura</span>
+            <div class="capture-grid">
+              <div class="cap-box"><span class="cap-label">Taxa Base</span><span class="cap-value" id="poke-capture">-</span></div>
+              <div class="cap-box"><span class="cap-label">Felicidade</span><span class="cap-value" id="poke-happiness">-</span></div>
+            </div>
+          </div>
+          <div class="extra-section">
+            <span class="extra-title">Fraquezas (x2 ou x4)</span>
+            <div id="poke-weaknesses" class="dmg-types"></div>
+          </div>
+          <div class="extra-section">
+            <span class="extra-title">Resistências (x0.5, x0.25 ou Imune)</span>
+            <div id="poke-resistances" class="dmg-types"></div>
           </div>
         </div>
       </div>
