@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>POKÉDEX ULTRA V5</title>
+  <title>POKÉDEX ULTRA V7</title>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800;900&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -40,18 +40,18 @@
     
     body { margin: 0; padding: 0; background: linear-gradient(var(--bg-overlay), var(--bg-overlay)), var(--bg-gradient); background-attachment: fixed; color: var(--text-main); font-family: 'Poppins', sans-serif; display: flex; flex-direction: column; align-items: center; min-height: 100vh; transition: background 0.6s ease, color 0.3s ease; overflow-x: hidden; -webkit-overflow-scrolling: touch; }
     
-    .liquid-glass {
-      background: var(--glass-bg);
-      backdrop-filter: blur(10px) saturate(100%) contrast(100%);
-      -webkit-backdrop-filter: blur(10px) saturate(100%) contrast(100%);
-      border: 1px solid rgba(255, 255, 255, 0.3);
-      box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.4) inset, 0 0 0 1px rgba(255, 255, 255, 0.4), 0 8px 32px rgba(0, 0, 0, 0.25);
+    .liquid-glass { 
+      background: var(--glass-bg); 
+      backdrop-filter: blur(10px) saturate(100%) contrast(100%); 
+      -webkit-backdrop-filter: blur(10px) saturate(100%) contrast(100%); 
+      border: 1px solid rgba(255, 255, 255, 0.3); 
+      box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.4) inset, 0 0 0 1px rgba(255, 255, 255, 0.4), 0 8px 32px rgba(0, 0, 0, 0.25); 
     }
     .glass-bg { position: absolute; top: 0; bottom: 0; left: 0; right: 0; border-radius: inherit; z-index: 0; pointer-events: none; }
     
     #search-container { position: fixed; top: clamp(10px, 2vw, 15px); left: 50%; transform: translateX(-50%); width: 96%; max-width: 1000px; z-index: 100; padding: clamp(10px, 3vw, 15px); border-radius: clamp(20px, 4vw, 25px); display: flex; flex-wrap: wrap; gap: 6px; transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease; border-right: 1px solid rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.05); }
     #search-container > *:not(.glass-bg) { position: relative; z-index: 1; }
-
+    
     /* EFEITO DE BRILHO iOS 26 (GLOW) */
     #search-container::after, #main-card::after, .pokedex-card::after, .evo-card::after {
       content: '';
@@ -186,9 +186,9 @@
     }
     
     @media (min-width: 768px) {
-      #main-card { flex-direction: row; align-items: flex-start; gap: 30px; padding: 40px 30px; max-width: 800px; margin-top: 20px; }
-      .img-container { width: 40%; flex-shrink: 0; position: sticky; top: 120px; }
-      #poke-image { margin-top: -30px; width: 100%; max-width: 260px; height: auto; }
+      #main-card { flex-direction: row; align-items: flex-start; gap: 40px; padding: 50px 40px; max-width: 1000px; margin-top: 20px; }
+      .img-container { width: 45%; flex-shrink: 0; position: sticky; top: 120px; }
+      #poke-image { margin-top: -40px; width: 100%; max-width: 380px; height: auto; }
       .card-content { flex: 1; align-items: flex-start; text-align: left; }
       #poke-types, .moves-container { justify-content: flex-start; }
       .section-title { text-align: left; }
@@ -450,9 +450,9 @@
         list.forEach(p => {
            let parts = p.url.split('/'); let id = parts[parts.length - 2];
            if(parseInt(id) > 10000) return; 
-
+           
            let div = document.createElement('div'); div.className = 'pokedex-card';
-
+           
            const glassBg = document.createElement('div');
            glassBg.className = 'glass-bg liquid-glass';
            div.appendChild(glassBg);
@@ -490,7 +490,7 @@
            grid.appendChild(div);
            
            fetch('https://pokeapi.co/api/v2/pokemon/' + id).then(r => r.json()).then(pData => {
-
+               
                const pType = pData.types[0].type.name;
                let bgColor = typeColors[pType] || '#777';
                if (pData.types.length > 1) {
@@ -537,8 +537,8 @@
         if (!res.ok) throw new Error('Status ' + res.status); 
         const data = await res.json();
         
-
-        const primaryType = data.types[0].type.name;
+        
+        const primaryType = data.types[0].type.name; 
         const baseColor = typeColors[primaryType] || '#777';
         const typeDark = shadeColor(baseColor, -40);
         document.documentElement.style.setProperty('--type-color', baseColor);
@@ -546,7 +546,7 @@
 
         let bgGradient = `linear-gradient(135deg, ${baseColor} 0%, ${typeDark} 100%)`;
         let cardBg = baseColor;
-
+        
         if (data.types.length > 1) {
             const secondaryType = data.types[1].type.name;
             const secColor = typeColors[secondaryType] || '#777';
@@ -649,13 +649,13 @@
            const altForms = speciesData.varieties.filter(v => !v.is_default);
            if (altForms.length > 0) {
              varDiv.style.display = 'block'; altForms.forEach(v => {
-
-               let varId = v.pokemon.url.split('/')[6];
+               
+               let varId = v.pokemon.url.split('/')[6]; 
                let card = document.createElement('div'); card.className = 'evo-card';
                const glassBg = document.createElement('div');
                glassBg.className = 'glass-bg liquid-glass';
                card.appendChild(glassBg);
-
+               
                card.onclick = () => { document.getElementById('search-input').value = ''; fetchPokemon(v.pokemon.name); };
 
 
@@ -678,8 +678,8 @@
                varList.appendChild(card);
                
                fetch('https://pokeapi.co/api/v2/pokemon/' + varId).then(r => r.json()).then(pData => {
-
-                   const pType = pData.types[0].type.name;
+                   
+                   const pType = pData.types[0].type.name; 
                    let bgColor = typeColors[pType] || '#777';
                    if (pData.types.length > 1) {
                        const secColor = typeColors[pData.types[1].type.name] || '#777';
@@ -733,12 +733,12 @@
         extractEvo(evoData.chain); const evoDiv = document.getElementById('evolutions'); const evoList = document.getElementById('evo-list'); evoList.innerHTML = '';
         if (evolutions.length > 1) {
           evoDiv.style.display = 'block'; evolutions.forEach(evo => {
-
+            
             let card = document.createElement('div'); card.className = 'evo-card';
             const glassBg = document.createElement('div');
             glassBg.className = 'glass-bg liquid-glass';
             card.appendChild(glassBg);
-
+            
             card.onclick = () => { document.getElementById('search-input').value = ''; fetchPokemon(evo.id); };
 
 
@@ -760,8 +760,8 @@
             evoList.appendChild(card);
             
             fetch('https://pokeapi.co/api/v2/pokemon/' + evo.id).then(r => r.json()).then(pData => {
-
-                   const pType = pData.types[0].type.name;
+                 
+                   const pType = pData.types[0].type.name; 
                    let bgColor = typeColors[pType] || '#777';
                    if (pData.types.length > 1) {
                        const secColor = typeColors[pData.types[1].type.name] || '#777';
