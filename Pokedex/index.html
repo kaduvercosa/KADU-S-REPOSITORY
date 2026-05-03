@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>MasterDex - PokeAPI</title>
+  <title>POKÉDEX ULTRA V5</title>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800;900&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -141,7 +141,19 @@
       letter-spacing: 1px;
       line-height: 1.6;
     }
-    footer span { font-weight: 900; color: var(--type-color); filter: brightness(1.2); }
+    
+    /* MODIFICADO: Estilo dos links do rodapé */
+    footer a { 
+      font-weight: 900; 
+      color: var(--type-color); 
+      filter: brightness(1.2); 
+      text-decoration: none;
+      transition: filter 0.2s ease, text-decoration 0.2s ease;
+    }
+    footer a:hover {
+      filter: brightness(1.5);
+      text-decoration: underline;
+    }
     
     @media (min-width: 768px) {
       #main-card { flex-direction: row; align-items: flex-start; gap: 30px; padding: 40px 30px; max-width: 800px; margin-top: 20px; }
@@ -237,9 +249,10 @@
     </div>
   </div>
 
+  <!-- MODIFICADO: Links Adicionados ao Rodapé -->
   <footer>
-    MASTERDEX © 2026<br>
-    DESENVOLVIDO POR <span>EDUARDO</span> | POWERED BY <span>POKEAPI</span>
+    POKÉDEX ULTRA © 2026<br>
+    DESENVOLVIDO POR <a href="https://github.com/kaduvercosa" target="_blank">EDUARDO</a> | POWERED BY <a href="https://pokeapi.co/" target="_blank">POKEAPI</a>
   </footer>
 
   <script>
