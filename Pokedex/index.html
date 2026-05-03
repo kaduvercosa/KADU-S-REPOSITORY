@@ -17,7 +17,7 @@
       --text-main: #1a1a2e; --text-muted: #4a4a5a;
       --btn-bg: #ffffff; --stat-bg: rgba(0, 0, 0, 0.1);
     }
-    /* TEMA ESCURO (Fumê Sofisticado) */
+    /* TEMA ESCURO */
     @media (prefers-color-scheme: dark) {
       :root {
         --bg-overlay: rgba(10, 10, 15, 0.55);
@@ -31,17 +31,11 @@
     }
     @keyframes float { 0% { transform: translateY(0px); filter: drop-shadow(0 15px 25px rgba(0,0,0,0.4)); } 50% { transform: translateY(-12px); filter: drop-shadow(0 25px 35px rgba(0,0,0,0.25)); } 100% { transform: translateY(0px); filter: drop-shadow(0 15px 25px rgba(0,0,0,0.4)); } }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+    
     * { box-sizing: border-box; scrollbar-width: thin; scrollbar-color: var(--type-color) transparent; -webkit-tap-highlight-color: transparent; }
     body { margin: 0; padding: 0; background: linear-gradient(var(--bg-overlay), var(--bg-overlay)), linear-gradient(135deg, var(--type-color) 0%, var(--type-dark) 100%); background-attachment: fixed; color: var(--text-main); font-family: 'Poppins', sans-serif; display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding-bottom: 60px; transition: background 0.6s ease, color 0.3s ease; overflow-x: hidden; -webkit-overflow-scrolling: touch; }
     
-    .liquid-glass {
-      background: var(--glass-bg);
-      backdrop-filter: blur(25px) saturate(150%);
-      -webkit-backdrop-filter: blur(25px) saturate(150%);
-      border-top: 1px solid var(--glass-border);
-      border-left: 1px solid var(--glass-border);
-      box-shadow: var(--glass-shadow);
-    }
+    .liquid-glass { background: var(--glass-bg); backdrop-filter: blur(25px) saturate(150%); -webkit-backdrop-filter: blur(25px) saturate(150%); border-top: 1px solid var(--glass-border); border-left: 1px solid var(--glass-border); box-shadow: var(--glass-shadow); }
     
     #search-container { position: fixed; top: clamp(10px, 2vw, 15px); left: 50%; transform: translateX(-50%); width: 94%; max-width: 1000px; z-index: 100; padding: clamp(10px, 3vw, 15px); border-radius: clamp(20px, 4vw, 25px); display: flex; flex-wrap: wrap; gap: 8px; transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease; border-right: 1px solid rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.05); }
     .hide-nav { transform: translate(-50%, -150%) !important; opacity: 0; pointer-events: none; }
@@ -57,14 +51,23 @@
     button:active { transform: scale(0.94); }
     .btn-nav { background: var(--type-color); color: #ffffff; border: 1px solid rgba(255,255,255,0.4); text-shadow: 0 1px 3px rgba(0,0,0,0.3); transition: background 0.6s ease; }
     
-    #search-input { flex: 1 1 100%; min-width: 100%; order: 1; padding: 12px 15px; font-size: 14px; }
+    /* ENVOLTÓRIO DA BARRA DE PESQUISA (Para o Autocomplete funcionar) */
+    #input-wrapper { flex: 1 1 100%; min-width: 100%; order: 1; position: relative; }
+    #search-input { width: 100%; padding: 12px 15px; font-size: 14px; }
+    
+    /* ESTILO DA LISTA AO VIVO */
+    #autocomplete-list { position: absolute; top: 100%; left: 0; right: 0; margin-top: 8px; max-height: 220px; overflow-y: auto; border-radius: 18px; z-index: 200; display: none; flex-direction: column; background: var(--glass-panel); backdrop-filter: blur(20px); border: 1px solid var(--glass-border); box-shadow: 0 10px 30px rgba(0,0,0,0.2); padding: 5px; }
+    .autocomplete-item { padding: 8px 12px; cursor: pointer; border-radius: 12px; font-size: 13px; font-weight: 700; text-transform: capitalize; display: flex; align-items: center; gap: 12px; transition: background 0.2s ease; }
+    .autocomplete-item:hover, .autocomplete-item:active { background: var(--type-color); color: #fff; }
+    .ac-img { width: 40px; height: 40px; object-fit: contain; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2)); }
+    
     select { flex: 1 1 calc(50% - 4px); min-width: calc(50% - 4px); order: 2; padding: 12px 10px; font-size: 13px; }
     .btn-action { flex: 1 1 calc(50% - 4px); order: 3; padding: 12px 10px; font-size: 11px; }
     .btn-nav { flex: 1 1 100%; order: 4; padding: 12px; font-size: 12px; }
     
     @media (min-width: 768px) {
       #search-container { flex-wrap: nowrap; gap: 10px; }
-      #search-input { flex: 2 1 200px; min-width: 200px; order: 1; padding: 14px 20px; font-size: 15px; }
+      #input-wrapper { flex: 2 1 200px; min-width: 200px; order: 1; }
       select { flex: 1 1 120px; min-width: 120px; order: 2; padding: 14px; font-size: 14px; }
       .btn-action { flex: 1 1 100px; order: 3; padding: 14px; font-size: 13px; }
       .btn-nav { flex: 1 1 120px; order: 4; padding: 14px; font-size: 13px; }
@@ -140,7 +143,12 @@
 </head>
 <body>
   <div id="search-container" class="liquid-glass">
-    <input type="text" id="search-input" placeholder="Nome, ID ou Variação...">
+    <!-- ENVOLTÓRIO DA BUSCA COM AUTOCOMPLETE -->
+    <div id="input-wrapper">
+      <input type="text" id="search-input" placeholder="Nome, ID ou Variação..." autocomplete="off">
+      <div id="autocomplete-list"></div>
+    </div>
+    
     <select id="gen-filter" onchange="handleFilter(this.value, 'gen')">
       <option value="">Geracão...</option>
       <option value="1">1ª Gen</option><option value="2">2ª Gen</option><option value="3">3ª Gen</option>
@@ -207,6 +215,69 @@
   </div>
 
   <script>
+    // ====== LÓGICA DE AUTOCOMPLETE (BUSCA AO VIVO) ======
+    let allPokemonList = [];
+    
+    // Baixa todos os 1025 nomes de uma vez só no fundo para a busca ficar super rápida
+    async function loadAllPokemon() {
+      try {
+        const res = await fetch('https://pokeapi.co/api/v2/pokemon?limit=1025');
+        const data = await res.json();
+        allPokemonList = data.results.map(p => {
+          const parts = p.url.split('/');
+          return { name: p.name, id: parts[parts.length - 2] };
+        });
+      } catch (e) { console.log("Erro ao carregar lista p/ autocomplete"); }
+    }
+    window.addEventListener('load', loadAllPokemon);
+
+    const searchInput = document.getElementById('search-input');
+    const autocompleteList = document.getElementById('autocomplete-list');
+
+    // Escuta tudo o que você digita na barra
+    searchInput.addEventListener('input', function() {
+      const val = this.value.toLowerCase().trim().replace(/[^a-z0-9-]/g, '');
+      autocompleteList.innerHTML = '';
+      
+      if (!val) {
+        autocompleteList.style.display = 'none';
+        return;
+      }
+      
+      // Filtra os nomes que combinam com o que foi digitado (mostra no máx 6 para não poluir)
+      const matches = allPokemonList.filter(p => p.name.includes(val) || p.id === val).slice(0, 6);
+      
+      if (matches.length > 0) {
+        autocompleteList.style.display = 'flex';
+        matches.forEach(match => {
+          const div = document.createElement('div');
+          div.className = 'autocomplete-item';
+          
+          const formatName = match.name.replace(/-/g, ' ');
+          div.innerHTML = `<img class="ac-img" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${match.id}.png"> 
+                           <span>#${match.id.padStart(3,'0')} - ${formatName}</span>`;
+                           
+          div.onclick = () => {
+            searchInput.value = formatName;
+            autocompleteList.style.display = 'none';
+            if (currentMode === 'list') toggleView();
+            fetchPokemon(match.id);
+          };
+          autocompleteList.appendChild(div);
+        });
+      } else {
+        autocompleteList.style.display = 'none';
+      }
+    });
+
+    // Esconde a lista se clicar fora dela
+    document.addEventListener('click', function(e) {
+      if (!document.getElementById('input-wrapper').contains(e.target)) {
+        autocompleteList.style.display = 'none';
+      }
+    });
+    // ====================================================
+
     function adjustSpacer() {
       requestAnimationFrame(() => {
         const header = document.getElementById('search-container');
@@ -339,12 +410,10 @@
         document.getElementById('poke-name').innerText = formattedName;
         document.getElementById('poke-id').innerText = '#' + data.id.toString().padStart(3, '0');
 
-        // ==========================================
-        // MÁGICA DA URL ACONTECE AQUI
-        // ==========================================
-        const novaUrl = window.location.pathname + '?id=' + data.id;
+        // ====== AGORA A URL ATUALIZA COM O NOME DO POKEMON ======
+        const novaUrl = window.location.pathname + '?id=' + data.name;
         window.history.pushState({ path: novaUrl }, '', novaUrl);
-        // ==========================================
+        // =========================================================
         
         const typesDiv = document.getElementById('poke-types'); typesDiv.innerHTML = '';
         data.types.forEach(t => {
@@ -444,8 +513,18 @@
       } catch (e) {}
     }
     
-    function searchPokemon() { if(currentMode === 'list') toggleView(); const val = document.getElementById('search-input').value; if(val) fetchPokemon(val); }
-    function randomPokemon() { if(currentMode === 'list') toggleView(); document.getElementById('search-input').value = ''; fetchPokemon(Math.floor(Math.random() * 1025) + 1); }
+    function searchPokemon() { 
+      document.getElementById('autocomplete-list').style.display = 'none'; 
+      if(currentMode === 'list') toggleView(); 
+      const val = document.getElementById('search-input').value; 
+      if(val) fetchPokemon(val); 
+    }
+    function randomPokemon() { 
+      document.getElementById('autocomplete-list').style.display = 'none'; 
+      if(currentMode === 'list') toggleView(); 
+      document.getElementById('search-input').value = ''; 
+      fetchPokemon(Math.floor(Math.random() * 1025) + 1); 
+    }
     document.getElementById('search-input').addEventListener('keypress', (e) => { if (e.key === 'Enter') searchPokemon(); });
     
     function getPokemonFromUrl() {
@@ -455,7 +534,6 @@
       if (!id && window.location.hash.includes('id=')) {
           id = window.location.hash.split('id=')[1].split('&')[0];
       }
-
       return id; 
     }
 
