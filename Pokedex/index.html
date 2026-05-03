@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>POKÉDEX ULTRA V3</title>
+  <title>MasterDex - PokeAPI</title>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800;900&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -34,7 +34,6 @@
     
     * { box-sizing: border-box; scrollbar-width: thin; scrollbar-color: var(--type-color) transparent; -webkit-tap-highlight-color: transparent; }
     
-    /* MODIFICADO: HTML agora recebe a cor escura para esconder a faixa branca do iOS */
     html { background-color: var(--type-dark); transition: background-color 0.6s ease; }
     
     body { margin: 0; padding: 0; background: linear-gradient(var(--bg-overlay), var(--bg-overlay)), linear-gradient(135deg, var(--type-color) 0%, var(--type-dark) 100%); background-attachment: fixed; color: var(--text-main); font-family: 'Poppins', sans-serif; display: flex; flex-direction: column; align-items: center; min-height: 100vh; transition: background 0.6s ease, color 0.3s ease; overflow-x: hidden; -webkit-overflow-scrolling: touch; }
@@ -130,12 +129,11 @@
     .card-types { display: flex; gap: 4px; justify-content: center; flex-wrap: wrap; width: 100%; min-height: 18px; }
     .mini-type { padding: 3px 8px; border-radius: 10px; font-size: 9px; font-family: 'Montserrat', sans-serif; font-weight: 800; text-transform: uppercase; color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.5); box-shadow: 0 2px 5px rgba(0,0,0,0.3); letter-spacing: 0.5px; border: 1px solid rgba(255,255,255,0.3); }
     
-    /* MODIFICADO: Estilo do Rodapé */
     footer {
       width: 100%;
       text-align: center;
       padding: 30px 15px 40px 15px;
-      margin-top: auto; /* Empurra o rodapé pro fim da página */
+      margin-top: auto; 
       font-size: 11px;
       color: rgba(255, 255, 255, 0.7);
       font-family: 'Montserrat', sans-serif;
@@ -239,7 +237,6 @@
     </div>
   </div>
 
-  <!-- MODIFICADO: Créditos Adicionados -->
   <footer>
     MASTERDEX © 2026<br>
     DESENVOLVIDO POR <span>EDUARDO</span> | POWERED BY <span>POKEAPI</span>
@@ -262,7 +259,7 @@
 
     async function loadAllPokemon() {
       try {
-        const res = await fetch('https://pokeapi.co/api/v2/pokemon?limit=1025');
+        const res = await fetch('https://pokeapi.co/api/v2/pokemon?limit=100000&offset=0');
         const data = await res.json();
         allPokemonList = data.results.map(p => {
           const parts = p.url.split('/');
@@ -325,18 +322,15 @@
     window.addEventListener('resize', adjustSpacer);
     window.addEventListener('load', adjustSpacer);
     
-    // MODIFICADO: Lógica do Menu ao Fazer Scroll
     let lastScroll = window.scrollY;
     window.addEventListener('scroll', () => {
       const header = document.getElementById('search-container');
       const currentScroll = window.scrollY;
       
-      // Esconde o menu se descer um pouquinho (mais de 50px)
       if (currentScroll > 50) {
         header.classList.add('hide-nav');
         if(document.activeElement.tagName === 'INPUT') document.activeElement.blur();
       } 
-      // Mostra o menu de novo APENAS se voltar pro topo absoluto (menos de 10px)
       else if (currentScroll <= 10) {
         header.classList.remove('hide-nav');
       }
