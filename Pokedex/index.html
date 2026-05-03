@@ -8,6 +8,8 @@
   <style>
     :root {
       --type-color: #6390F0; --type-dark: #3b5690;
+      --bg-gradient: linear-gradient(135deg, var(--type-color) 0%, var(--type-dark) 100%);
+      --nav-bg: var(--type-color);
       /* TEMA CLARO */
       --bg-overlay: rgba(255, 255, 255, 0.45);
       --glass-bg: rgba(255, 255, 255, 0.65);
@@ -36,11 +38,32 @@
     
     html { background-color: var(--type-dark); transition: background-color 0.6s ease; }
     
-    body { margin: 0; padding: 0; background: linear-gradient(var(--bg-overlay), var(--bg-overlay)), linear-gradient(135deg, var(--type-color) 0%, var(--type-dark) 100%); background-attachment: fixed; color: var(--text-main); font-family: 'Poppins', sans-serif; display: flex; flex-direction: column; align-items: center; min-height: 100vh; transition: background 0.6s ease, color 0.3s ease; overflow-x: hidden; -webkit-overflow-scrolling: touch; }
+    body { margin: 0; padding: 0; background: linear-gradient(var(--bg-overlay), var(--bg-overlay)), var(--bg-gradient); background-attachment: fixed; color: var(--text-main); font-family: 'Poppins', sans-serif; display: flex; flex-direction: column; align-items: center; min-height: 100vh; transition: background 0.6s ease, color 0.3s ease; overflow-x: hidden; -webkit-overflow-scrolling: touch; }
     
     .liquid-glass { background: var(--glass-bg); backdrop-filter: blur(25px) saturate(150%); -webkit-backdrop-filter: blur(25px) saturate(150%); border-top: 1px solid var(--glass-border); border-left: 1px solid var(--glass-border); box-shadow: var(--glass-shadow); }
+    .glass-bg { position: absolute; top: 0; bottom: 0; left: 0; right: 0; border-radius: inherit; z-index: 0; pointer-events: none; }
     
     #search-container { position: fixed; top: clamp(10px, 2vw, 15px); left: 50%; transform: translateX(-50%); width: 96%; max-width: 1000px; z-index: 100; padding: clamp(10px, 3vw, 15px); border-radius: clamp(20px, 4vw, 25px); display: flex; flex-wrap: wrap; gap: 6px; transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease; border-right: 1px solid rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.05); }
+    #search-container > *:not(.glass-bg) { position: relative; z-index: 1; }
+
+    /* EFEITO DE BRILHO iOS 26 (GLOW) */
+    #search-container::after, #main-card::after, .pokedex-card::after, .evo-card::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      border-radius: inherit;
+      background: var(--card-bg, var(--nav-bg));
+      filter: blur(20px);
+      opacity: 0.2;
+      z-index: -1;
+      transition: opacity 0.4s ease, filter 0.4s ease, transform 0.4s ease;
+      pointer-events: none;
+    }
+    #search-container:hover::after, .pokedex-card:hover::after, .evo-card:hover::after {
+      opacity: 0.6;
+      filter: blur(25px);
+      transform: scale(1.05);
+    }
     .hide-nav { transform: translate(-50%, -150%) !important; opacity: 0; pointer-events: none; }
     
     #top-spacer { width: 100%; display: block; transition: height 0.3s ease; }
@@ -52,14 +75,14 @@
     
     button { border-radius: 16px; border: 1px solid var(--glass-border); background: var(--btn-bg); color: var(--text-main); font-family: 'Montserrat', sans-serif; font-weight: 900; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 4px 15px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center; letter-spacing: 0.5px; text-transform: uppercase; }
     button:active { transform: scale(0.94); }
-    .btn-nav { background: var(--type-color); color: #ffffff; border: 1px solid rgba(255,255,255,0.4); text-shadow: 0 1px 3px rgba(0,0,0,0.3); transition: background 0.6s ease; }
+    .btn-nav { background: var(--nav-bg); color: #ffffff; border: 1px solid rgba(255,255,255,0.4); text-shadow: 0 1px 3px rgba(0,0,0,0.3); transition: background 0.6s ease; }
     
     #input-wrapper { flex: 1 1 100%; min-width: 100%; order: 1; position: relative; }
     #search-input { width: 100%; padding: 12px 15px; font-size: 14px; }
     
     #autocomplete-list { position: absolute; top: 100%; left: 0; right: 0; margin-top: 8px; max-height: 220px; overflow-y: auto; border-radius: 18px; z-index: 200; display: none; flex-direction: column; background: var(--glass-panel); backdrop-filter: blur(20px); border: 1px solid var(--glass-border); box-shadow: 0 10px 30px rgba(0,0,0,0.2); padding: 5px; }
     .autocomplete-item { padding: 8px 12px; cursor: pointer; border-radius: 12px; font-size: 13px; font-weight: 700; text-transform: capitalize; display: flex; align-items: center; gap: 12px; transition: background 0.2s ease; }
-    .autocomplete-item:hover, .autocomplete-item:active { background: var(--type-color); color: #fff; }
+    .autocomplete-item:hover, .autocomplete-item:active { background: var(--nav-bg); color: #fff; }
     .ac-img { width: 40px; height: 40px; object-fit: contain; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2)); }
     
     select { flex: 1 1 calc(33.33% - 4px); min-width: calc(33.33% - 4px); order: 2; padding: 10px 4px; font-size: 11px; text-align: center; }
@@ -79,7 +102,8 @@
     .view-section { display: none; width: 100%; flex-direction: column; align-items: center; animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
     .active-view { display: flex !important; }
     
-    #main-card { border-radius: clamp(30px, 5vw, 45px); padding: clamp(25px, 6vw, 40px) clamp(15px, 4vw, 40px); width: 94%; max-width: 850px; display: flex; flex-direction: column; align-items: center; gap: 15px; }
+    #main-card { position: relative; border-radius: clamp(30px, 5vw, 45px); padding: clamp(25px, 6vw, 40px) clamp(15px, 4vw, 40px); width: 94%; max-width: 850px; display: flex; flex-direction: column; align-items: center; gap: 15px; }
+    #main-card > *:not(.glass-bg) { position: relative; z-index: 1; }
     .img-container { position: relative; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; }
     #poke-image { width: clamp(160px, 45vw, 260px); height: clamp(160px, 45vw, 260px); object-fit: contain; margin-top: -60px; z-index: 10; animation: float 6s ease-in-out infinite; filter: drop-shadow(0 15px 25px rgba(0,0,0,0.3)); }
     .card-content { width: 100%; display: flex; flex-direction: column; align-items: center; text-align: center; }
@@ -112,13 +136,13 @@
     #full-pokedex { width: 96%; max-width: 1200px; display: flex; flex-direction: column; align-items: center; }
     .grid-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; width: 100%; padding: 10px 5px; padding-bottom: 20px; }
     
-    .pokedex-card, .evo-card { position: relative; border-radius: 20px; padding: 15px 10px; text-align: center; cursor: pointer; transition: transform 0.2s ease, box-shadow 0.2s; display: flex; flex-direction: column; align-items: center; overflow: hidden; width: clamp(100px, 28vw, 130px); }
+    .pokedex-card, .evo-card { position: relative; border-radius: 20px; padding: 15px 10px; text-align: center; cursor: pointer; transition: transform 0.2s ease, box-shadow 0.2s; display: flex; flex-direction: column; align-items: center; width: clamp(100px, 28vw, 130px); }
     .pokedex-card { width: auto; }
-    .pokedex-card::before, .evo-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: var(--card-bg, transparent); opacity: 0; transition: opacity 0.5s ease; z-index: 0; pointer-events: none; }
+    .pokedex-card::before, .evo-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: var(--card-bg, transparent); opacity: 0; transition: opacity 0.5s ease; z-index: 0; pointer-events: none; border-radius: inherit; }
     .pokedex-card.colored-card::before, .evo-card.colored-card::before { opacity: 0.35; }
     @media (prefers-color-scheme: dark) { .pokedex-card.colored-card::before, .evo-card.colored-card::before { opacity: 0.25; } }
     
-    .pokedex-card > *, .evo-card > * { position: relative; z-index: 1; }
+    .pokedex-card > *:not(.glass-bg), .evo-card > *:not(.glass-bg) { position: relative; z-index: 1; }
     .pokedex-card:active, .evo-card:active { transform: scale(0.94); }
     
     .evo-id { font-size: 11px; font-weight: 900; background: rgba(0,0,0,0.5); color: #fff; padding: 4px 12px; border-radius: 12px; margin-bottom: 8px; letter-spacing: 1px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); }
@@ -169,7 +193,8 @@
   </style>
 </head>
 <body>
-  <div id="search-container" class="liquid-glass">
+  <div id="search-container">
+    <div class="glass-bg liquid-glass"></div>
     <div id="input-wrapper">
       <input type="text" id="search-input" placeholder="Nome, ID..." autocomplete="off">
       <div id="autocomplete-list"></div>
@@ -205,7 +230,8 @@
   <div id="top-spacer"></div>
   <div id="content-wrapper">
     <div id="detail-view" class="view-section active-view">
-      <div id="main-card" class="liquid-glass">
+      <div id="main-card">
+        <div class="glass-bg liquid-glass"></div>
         <div class="img-container">
            <img id="poke-image" src="" alt="" onclick="randomPokemon()">
         </div>
@@ -418,7 +444,13 @@
         list.forEach(p => {
            let parts = p.url.split('/'); let id = parts[parts.length - 2];
            if(parseInt(id) > 10000) return; 
-           let div = document.createElement('div'); div.className = 'pokedex-card liquid-glass';
+
+           let div = document.createElement('div'); div.className = 'pokedex-card';
+
+           const glassBg = document.createElement('div');
+           glassBg.className = 'glass-bg liquid-glass';
+           div.appendChild(glassBg);
+
            div.onclick = () => { document.getElementById('search-input').value = p.name; toggleView(); searchPokemon(); };
            
            const idDiv = document.createElement('div');
@@ -452,10 +484,16 @@
            grid.appendChild(div);
            
            fetch('https://pokeapi.co/api/v2/pokemon/' + id).then(r => r.json()).then(pData => {
+
                const pType = pData.types[0].type.name;
-               const bgColor = typeColors[pType] || '#777';
+               let bgColor = typeColors[pType] || '#777';
+               if (pData.types.length > 1) {
+                   const secColor = typeColors[pData.types[1].type.name] || '#777';
+                   bgColor = `linear-gradient(180deg, ${bgColor} 0%, ${secColor} 100%)`;
+               }
                div.style.setProperty('--card-bg', bgColor);
                div.classList.add('colored-card');
+
 
                const typesContainer = document.getElementById('ptypes-' + id);
                if (typesContainer) {
@@ -493,9 +531,26 @@
         if (!res.ok) throw new Error('Status ' + res.status); 
         const data = await res.json();
         
-        const primaryType = data.types[0].type.name; const baseColor = typeColors[primaryType] || '#777';
+
+        const primaryType = data.types[0].type.name;
+        const baseColor = typeColors[primaryType] || '#777';
+        const typeDark = shadeColor(baseColor, -40);
         document.documentElement.style.setProperty('--type-color', baseColor);
-        document.documentElement.style.setProperty('--type-dark', shadeColor(baseColor, -40));
+        document.documentElement.style.setProperty('--type-dark', typeDark);
+
+        let bgGradient = `linear-gradient(135deg, ${baseColor} 0%, ${typeDark} 100%)`;
+        let cardBg = baseColor;
+
+        if (data.types.length > 1) {
+            const secondaryType = data.types[1].type.name;
+            const secColor = typeColors[secondaryType] || '#777';
+            bgGradient = `linear-gradient(135deg, ${baseColor} 0%, ${secColor} 100%)`;
+            cardBg = `linear-gradient(180deg, ${baseColor} 0%, ${secColor} 100%)`;
+        }
+        document.documentElement.style.setProperty('--bg-gradient', bgGradient);
+        document.getElementById('main-card').style.setProperty('--card-bg', cardBg);
+        document.getElementById('search-container').style.setProperty('--nav-bg', cardBg);
+
         
         document.getElementById('poke-image').src = data.sprites.other['official-artwork'].front_default || data.sprites.front_default;
         let formattedName = data.name.replace(/-/g, ' ');
@@ -588,8 +643,15 @@
            const altForms = speciesData.varieties.filter(v => !v.is_default);
            if (altForms.length > 0) {
              varDiv.style.display = 'block'; altForms.forEach(v => {
-               let varId = v.pokemon.url.split('/')[6]; let card = document.createElement('div'); card.className = 'evo-card liquid-glass';
+
+               let varId = v.pokemon.url.split('/')[6];
+               let card = document.createElement('div'); card.className = 'evo-card';
+               const glassBg = document.createElement('div');
+               glassBg.className = 'glass-bg liquid-glass';
+               card.appendChild(glassBg);
+
                card.onclick = () => { document.getElementById('search-input').value = ''; fetchPokemon(v.pokemon.name); };
+
 
                const idDiv = document.createElement('div');
                idDiv.className = 'evo-id';
@@ -610,8 +672,15 @@
                varList.appendChild(card);
                
                fetch('https://pokeapi.co/api/v2/pokemon/' + varId).then(r => r.json()).then(pData => {
-                   const pType = pData.types[0].type.name; const bgColor = typeColors[pType] || '#777';
+
+                   const pType = pData.types[0].type.name;
+                   let bgColor = typeColors[pType] || '#777';
+                   if (pData.types.length > 1) {
+                       const secColor = typeColors[pData.types[1].type.name] || '#777';
+                       bgColor = `linear-gradient(180deg, ${bgColor} 0%, ${secColor} 100%)`;
+                   }
                    card.style.setProperty('--card-bg', bgColor); card.classList.add('colored-card');
+
                }).catch(e=>{ console.error("Error fetching alternative form data:", e); });
              });
            } else { varDiv.style.display = 'none'; }
@@ -658,8 +727,14 @@
         extractEvo(evoData.chain); const evoDiv = document.getElementById('evolutions'); const evoList = document.getElementById('evo-list'); evoList.innerHTML = '';
         if (evolutions.length > 1) {
           evoDiv.style.display = 'block'; evolutions.forEach(evo => {
-            let card = document.createElement('div'); card.className = 'evo-card liquid-glass';
+
+            let card = document.createElement('div'); card.className = 'evo-card';
+            const glassBg = document.createElement('div');
+            glassBg.className = 'glass-bg liquid-glass';
+            card.appendChild(glassBg);
+
             card.onclick = () => { document.getElementById('search-input').value = ''; fetchPokemon(evo.id); };
+
 
             const idDiv = document.createElement('div');
             idDiv.className = 'evo-id';
@@ -679,8 +754,15 @@
             evoList.appendChild(card);
             
             fetch('https://pokeapi.co/api/v2/pokemon/' + evo.id).then(r => r.json()).then(pData => {
-                 const pType = pData.types[0].type.name; const bgColor = typeColors[pType] || '#777';
-                 card.style.setProperty('--card-bg', bgColor); card.classList.add('colored-card');
+
+                   const pType = pData.types[0].type.name;
+                   let bgColor = typeColors[pType] || '#777';
+                   if (pData.types.length > 1) {
+                       const secColor = typeColors[pData.types[1].type.name] || '#777';
+                       bgColor = `linear-gradient(180deg, ${bgColor} 0%, ${secColor} 100%)`;
+                   }
+                   card.style.setProperty('--card-bg', bgColor); card.classList.add('colored-card');
+
             }).catch(e=>{ console.error("Error fetching evolution data:", e); });
           });
         } else { evoDiv.style.display = 'none'; }
