@@ -90,7 +90,7 @@
     #input-wrapper { flex: 1 1 100%; min-width: 100%; order: 1; position: relative; z-index:50; }
     #search-input { width: 100%; padding: 12px 15px; font-size: 14px; }
     
-    #autocomplete-list { position: absolute; top: 100%; left: 0; right: 0; margin-top: 8px; max-height: 220px; overflow-y: auto; border-radius: 18px; z-index: 200; display: none; flex-direction: column; background: var(--ac-bg); color: var(--ac-text); backdrop-filter: blur(25px); border: 1px solid var(--glass-border); box-shadow: 0 15px 40px rgba(0,0,0,0.4); padding: 5px; }
+    #autocomplete-list { position: absolute; top: 100%; left: 0; right: 0; margin-top: 8px; max-height: 220px; overflow-y: auto; border-radius: 18px; z-index: 50; display: none; flex-direction: column; background: var(--ac-bg); color: var(--ac-text); backdrop-filter: none; border: 1px solid var(--glass-border); box-shadow: 0 15px 40px rgba(0,0,0,0.4); padding: 5px; }
     .autocomplete-item { padding: 8px 12px; cursor: pointer; border-radius: 12px; font-size: 13px; font-weight: 700; text-transform: capitalize; display: flex; align-items: center; gap: 12px; transition: background 0.2s ease; }
     .autocomplete-item:hover, .autocomplete-item:active { background: var(--nav-bg); color: var(--ac-text); }
     .ac-img { width: 40px; height: 40px; object-fit: contain; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2)); }
