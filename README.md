@@ -5,7 +5,11 @@
 * POKÉDEX ULTRA V5
 
 ## Live Demo
-Check out the live Pokédex here: [https://kaduvercosa.github.io/KADU-WORKSPACE/Pokedex/](https://kaduvercosa.github.io/KADU-WORKSPACE/Pokedex/)
+Check out the live Pokédex here: 
+
+[https://kaduvercosa.github.io/KADU-WORKSPACE/Pokedex/](https://kaduvercosa.github.io/KADU-WORKSPACE/Pokedex/)
+
+[https://kaduvercosa.github.io/KADU-WORKSPACE/feat-pokedex-dual-type-gradients-glow-11633516229114617311](https://kaduvercosa.github.io/KADU-WORKSPACE/feat-pokedex-dual-type-gradients-glow-11633516229114617311)
 
 ## Features
 * **Detailed View:** View individual Pokémon with attributes, stats, moves, abilities, items, and evolutions.
