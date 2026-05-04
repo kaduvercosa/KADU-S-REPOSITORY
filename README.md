@@ -92,30 +92,23 @@ O arquivo `Pokedex/index.html` é um aplicativo de arquivo único que contém to
 1. Clone o repositório:
 
 ```bash
-
-git clone https://github.com/kaduvercosa/KADU-WORKSPACE.git
-
+git clone https://github.com/kaduvercosa/pokedexdokadu.git
 ```
 
 2. Navegue até o diretório raiz do repositório:
 
 ```bash
-
-cd KADU-WORKSPACE
-
+cd pokedexdokadu
 ```
 
 3. Inicie um servidor local. Por exemplo, usando Python 3:
 
 ```bash
-
 python3 -m http.server --directory Pokedex/
-
 ```
 
 4. Abra seu navegador e acesse:
 
 ```bash
-
 http://localhost:8000
 ```
