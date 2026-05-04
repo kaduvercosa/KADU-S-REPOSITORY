@@ -463,7 +463,7 @@
     <div id="compare-modal-content" class="modal-content" style="width: 94%; max-width: 850px; padding: clamp(25px, 6vw, 40px) clamp(15px, 4vw, 40px); overflow: visible; max-height: none; margin: auto;">
       <div class="modal-header" style="margin-bottom: 20px;">
         <h3 class="modal-title">Comparador</h3>
-        <button class="close-btn" onclick="closeCompareModal()">×</button>
+        <button class="close-btn" onclick="closeCompareModal()">X</button>
       </div>
 
       <div style="display:flex; gap:10px; margin-bottom: 20px; position:relative; z-index:10006;">
@@ -503,7 +503,7 @@
     <div class="modal-content" style="max-width: 400px; padding: 20px;">
       <div class="modal-header" style="margin-bottom: 15px; padding-bottom: 10px;">
         <h3 class="modal-title" id="im-title" style="font-size: 16px;">Detalhes</h3>
-        <button class="close-btn" onclick="closeInfoModal()">×</button>
+        <button class="close-btn" onclick="closeInfoModal()">X</button>
       </div>
       <div id="im-content" style="font-size: 13px; line-height: 1.6; color: var(--text-main);">
          Carregando...
@@ -515,7 +515,7 @@
   <div id="image-viewer-modal">
     <div class="viewer-overlay" onclick="closeImageViewer()"></div>
     <div class="viewer-content">
-      <button class="viewer-close" onclick="closeImageViewer()">×</button>
+      <button class="viewer-close" onclick="closeImageViewer()">X</button>
       <img id="viewer-img" class="viewer-img" src="" alt="Ampliado">
       <div id="viewer-label" class="viewer-label"></div>
     </div>
@@ -527,7 +527,7 @@
     <div class="modal-content details-content">
       <div class="modal-header">
         <h3 class="modal-title" id="dm-title">Detalhes do Pokémon</h3>
-        <button class="close-btn" onclick="closeDetailsModal()">×</button>
+        <button class="close-btn" onclick="closeDetailsModal()">X</button>
       </div>
 
       <div class="dm-section">
@@ -540,8 +540,8 @@
       <div class="dm-section">
         <h4 class="dm-subtitle">Reprodução (Breeding)</h4>
         <div class="info-grid">
-          <div class="info-box"><span class="info-label">Gênero</span><span class="info-value" id="dm-gender">-</span></div>
-          <div class="info-box"><span class="info-label">Ciclos (Passos)</span><span class="info-value" id="dm-cycles">-</span></div>
+          <div class="info-box full-width"><span class="info-label">Gênero</span><span class="info-value" id="dm-gender">-</span></div>
+          <div class="info-box full-width"><span class="info-label">Ciclos (Passos)</span><span class="info-value" id="dm-cycles">-</span></div>
           <div class="info-box full-width"><span class="info-label">Grupos de Ovos</span><span class="info-value" id="dm-egggroups">-</span></div>
         </div>
       </div>
@@ -549,9 +549,9 @@
       <div class="dm-section">
         <h4 class="dm-subtitle">Treinamento</h4>
         <div class="info-grid">
-          <div class="info-box"><span class="info-label">Exp Base</span><span class="info-value" id="dm-baseexp">-</span></div>
-          <div class="info-box"><span class="info-label">Amizade Base</span><span class="info-value" id="dm-basehappiness">-</span></div>
-          <div class="info-box"><span class="info-label">Taxa de Captura</span><span class="info-value" id="dm-capturerate">-</span></div>
+          <div class="info-box full-width"><span class="info-label">Exp Base</span><span class="info-value" id="dm-baseexp">-</span></div>
+          <div class="info-box full-width"><span class="info-label">Amizade Base</span><span class="info-value" id="dm-basehappiness">-</span></div>
+          <div class="info-box full-width"><span class="info-label">Taxa de Captura</span><span class="info-value" id="dm-capturerate">-</span></div>
           <div class="info-box full-width"><span class="info-label">Pontos de Esforço (EV Yield)</span><span class="info-value" id="dm-evs">-</span></div>
         </div>
       </div>
@@ -569,7 +569,7 @@
     <div class="modal-content">
       <div class="modal-header">
         <h3 class="modal-title">Configurações</h3>
-        <button class="close-btn" onclick="closeSettings()">×</button>
+        <button class="close-btn" onclick="closeSettings()">X</button>
       </div>
 
       <div class="setting-group">
