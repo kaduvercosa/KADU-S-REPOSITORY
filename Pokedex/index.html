@@ -92,6 +92,9 @@
     body.monochrome .type-badge, body.monochrome .mini-type, body.monochrome .stat-bar-fill { background: #888 !important; filter: grayscale(100%); }
     body.monochrome #main-card, body.monochrome #search-container, body.monochrome .colored-card { --card-bg: transparent !important; }
 
+    /* PIXEL ART MODE */
+    body.pixel-art #poke-image { image-rendering: pixelated; transform: scale(1.1); }
+
     /* DETAILS MODAL CSS */
     #details-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 10000; display: none; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s ease; }
     #details-modal.show-modal { display: flex; opacity: 1; }
@@ -474,6 +477,13 @@
       <div class="setting-group">
         <h4>Visual e Efeitos</h4>
         <div class="setting-item">
+          <span class="setting-label">Estilo de Imagem Principal</span>
+          <select id="setting-spritestyle" class="modal-select" onchange="saveSettings()">
+            <option value="official" selected>4K Oficial</option>
+            <option value="animated">Animado (Pixel Art)</option>
+          </select>
+        </div>
+        <div class="setting-item">
           <span class="setting-label">Tema Visual</span>
           <select id="setting-theme" class="modal-select" onchange="saveSettings()">
             <option value="auto">Automático</option>
@@ -828,7 +838,7 @@
         document.getElementById('search-container').style.setProperty('--nav-bg', cardBg);
 
         
-        document.getElementById('poke-image').src = data.sprites.other['official-artwork'].front_default || data.sprites.front_default;
+        document.getElementById('poke-image').src = getMainSpriteUrl(data, false);
         document.getElementById('poke-shiny-btn').innerHTML = "✨ SHINY";
         let formattedName = data.name.replace(/-/g, ' ');
         document.getElementById('poke-name').innerText = formattedName;
@@ -1164,10 +1174,10 @@
         const data = currentPokemonData;
 
         if (isShinyView) {
-            mainImg.src = data.sprites.other['official-artwork'].front_shiny || data.sprites.front_shiny || 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
+            mainImg.src = getMainSpriteUrl(data, true) || 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
             shinyBtn.innerHTML = "✨ NORMAL";
         } else {
-            mainImg.src = data.sprites.other['official-artwork'].front_default || data.sprites.front_default;
+            mainImg.src = getMainSpriteUrl(data, false);
             shinyBtn.innerHTML = "✨ SHINY";
         }
     }
@@ -1208,8 +1218,22 @@
     function closeSettings() { document.getElementById('settings-modal').classList.remove('show-modal'); }
 
 
-    let currentSpeciesData = null; // Store species data for details modal
-    let isImperial = false; // Store unit preference
+    let currentSpeciesData = null;
+    let isImperial = false;
+    let spriteStyle = 'official';
+
+    function getMainSpriteUrl(data, isShiny) {
+        if (!data) return '';
+        const sprites = data.sprites;
+        if (spriteStyle === 'animated' && sprites.other && sprites.other.showdown) {
+            const animUrl = isShiny ? sprites.other.showdown.front_shiny : sprites.other.showdown.front_default;
+            if (animUrl) return animUrl;
+        }
+        if (sprites.other && sprites.other['official-artwork']) {
+            return isShiny ? sprites.other['official-artwork'].front_shiny : sprites.other['official-artwork'].front_default;
+        }
+        return isShiny ? sprites.front_shiny : sprites.front_default;
+    }
 
     function openDetailsModal() {
         if (!currentPokemonData || !currentSpeciesData) return;
@@ -1292,6 +1316,7 @@
     // Settings adjustments
     function saveSettings() {
       const settings = {
+        spritestyle: document.getElementById('setting-spritestyle').value,
         theme: document.getElementById('setting-theme').value,
         monochrome: document.getElementById('setting-monochrome').checked,
         fontsize: document.getElementById('setting-fontsize').value,
@@ -1308,7 +1333,10 @@
       localStorage.setItem('pokedex-settings', JSON.stringify(settings));
       applySettings();
       // Re-render current pokemon to apply unit changes
-      if(currentPokemonData) updatePokemonUI(currentPokemonData);
+      if(currentPokemonData) {
+          updatePokemonUI(currentPokemonData);
+          document.getElementById('poke-image').src = getMainSpriteUrl(currentPokemonData, isShinyView);
+      }
     }
 
 
@@ -1321,6 +1349,7 @@
         const s = JSON.parse(saved);
 
         if (document.getElementById('setting-theme')) {
+            document.getElementById('setting-spritestyle').value = s.spritestyle || 'official';
             document.getElementById('setting-theme').value = s.theme || 'auto';
             document.getElementById('setting-monochrome').checked = s.monochrome || false;
             document.getElementById('setting-fontsize').value = s.fontsize || 'normal';
@@ -1336,6 +1365,7 @@
         }
 
         isImperial = s.units === 'imperial';
+        spriteStyle = s.spritestyle || 'official';
 
         if (s.theme === 'auto' || !s.theme) { document.documentElement.removeAttribute('data-theme'); }
         else { document.documentElement.setAttribute('data-theme', s.theme); }
@@ -1353,6 +1383,7 @@
         document.body.classList.toggle('hide-moves', s.moves === false);
         document.body.classList.toggle('hide-extra', s.extra === false);
         document.body.classList.toggle('hide-evo', s.evo === false);
+        document.body.classList.toggle('pixel-art', spriteStyle === 'animated');
 
       } catch (e) { console.error("Error applying settings", e); }
     }
