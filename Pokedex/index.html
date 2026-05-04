@@ -52,6 +52,9 @@
     #search-container { position: fixed; top: clamp(10px, 2vw, 15px); left: 50%; transform: translateX(-50%); width: 96%; max-width: 1000px; z-index: 100; padding: clamp(10px, 3vw, 15px); border-radius: clamp(20px, 4vw, 25px); display: flex; flex-wrap: wrap; gap: 6px; transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease; border-right: 1px solid rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.05); }
     #search-container > *:not(.glass-bg) { position: relative; z-index: 1; }
 
+    /* FIX: Ensure autocomplete wrapper stays above sibling filters */
+    #search-container > #input-wrapper { z-index: 9999; }
+
     /* EFEITO DE BRILHO iOS 26 (GLOW) */
     #search-container::after, #main-card::after, .pokedex-card::after, .evo-card::after {
       content: '';
