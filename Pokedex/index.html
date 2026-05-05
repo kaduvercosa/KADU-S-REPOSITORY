@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>POKÉDEX ULTRA IX</title>
+  <title>POKÉDEX ULTRA VIII</title>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800;900&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -337,7 +337,10 @@
       #main-card { display: grid; grid-template-columns: 45% 1fr; grid-template-rows: auto auto; column-gap: 40px; row-gap: 30px; padding: 50px 40px; max-width: 1000px; margin-top: 20px; }
       .img-container { width: 100%; grid-column: 1; grid-row: 1; position: relative; top: auto;  }
       #compare-modal-content { max-width: 1200px !important; padding: 50px 40px !important; }
-      .extra-info-container { width: 100%; grid-column: 1; grid-row: 2; margin-top: 0; align-self: start; position: sticky; top: 120px; }
+      
+      /* CORREÇÃO DO BUG DO CORTE NO CARD: Removido o 'position: sticky; top: 120px;' */
+      .extra-info-container { width: 100%; grid-column: 1; grid-row: 2; margin-top: 0; align-self: start; }
+      
       #poke-image { margin-top: -40px; width: 100%; max-width: none; height: auto; object-fit: contain; }
       .card-content { width: 100%; grid-column: 2; grid-row: 1 / span 2; align-items: flex-start; text-align: left; }
       
