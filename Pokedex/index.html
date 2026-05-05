@@ -350,12 +350,19 @@
       .full-width { grid-column: span 3; }
       .grid-container { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; }
       .dm-split-row {
-        flex-direction: row:;
-        gap: 25px:;
+        display: flex;
+        flex-direction: column;
       }
-      .dm-split-row .dm-section {
-        flex: 1;
-        margin-bottom: 25px;
+      @media (min-width: 768px) {
+        .dm-split-row {
+          display: grid !important;
+          grid-template-columns: 1fr 1fr;
+          gap: 20px;
+        }
+        .dm-split-row .dm-section {
+          margin-bottom: 0 !important;
+          height: 100%;
+        }
       }
     }
   </style>
@@ -364,7 +371,7 @@
   <div id="search-container">
     <div class="glass-bg liquid-glass"></div>
     <div id="input-wrapper">
-      <input type="text" id="search-input" placeholder="Nome, ID..." autocomplete="off">
+      <input type="text" id="search-input" placeholder="Digite Nome ou ID..." autocomplete="off">
       <div id="autocomplete-list"></div>
     </div>
     
